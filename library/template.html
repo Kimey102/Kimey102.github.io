@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>밍지의 알렉산드리아 도서관</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* 종이 플래너: 차가운 아이보리 종이, 흑연 잉크, 가는 괘선, 슬레이트 잉크 한 색 */
+  --paper:#f5f3ed;
+  --paper-2:#ecE9e0;
+  --ink:#2a2c2f;
+  --ink-soft:#6c6f74;
+  --rule:#d6d2c6;
+  --accent:#465a72;
+  --seed:#a39c88;
+  --grow:#6e8668;
+  --done:#465a72;
+  --shelf:#8d8678;
+  --f-display:"Gowun Batang", "Noto Serif KR", serif;
+  --f-body:"Noto Sans KR", system-ui, sans-serif;
+  --f-label:"DM Mono", ui-monospace, monospace;
+  color-scheme: light;
+  /* 레이아웃: 플래너 한 장 — 상단 머리띠, 펼쳐 둔 책 한 줄, 서가+상세 두 칸, 정원 세 칸 */
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-weight:400;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1200px;margin:0 auto;padding:28px 24px 64px;display:flex;flex-direction:column;gap:36px}
+.label{font-family:var(--f-label);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+
+/* 머리띠 */
+.masthead{display:flex;flex-direction:column;gap:14px;border-bottom:3px double var(--rule);padding-bottom:18px}
+.mast-top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.mast-title{display:flex;flex-direction:column;gap:2px}
+h1{font-family:var(--f-display);font-weight:700;font-size:28px;line-height:1.25;margin:0;text-wrap:balance}
+.today{font-family:var(--f-label);font-size:13px;letter-spacing:.08em;text-align:right}
+.mast-bottom{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.stats{display:flex;gap:22px;flex-wrap:wrap}
+.stat{display:flex;align-items:baseline;gap:8px}
+.stat b{font-family:var(--f-label);font-weight:500;font-size:18px;font-variant-numeric:tabular-nums}
+.sync{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--ink-soft)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--seed);flex:none}
+.sync[data-state="live"] .dot{background:var(--grow)}
+a.nolink{cursor:default}
+a.nolink:hover,a.nolink:hover .lt,a.nolink:hover .ct{text-decoration:none!important}
+/* 이 아카이브에 대하여 */
+.about{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:28px 40px}
+.about .lead{font-family:var(--f-display);font-size:19px;line-height:1.65;margin:0;text-wrap:pretty}
+.about .lead-by{display:block;margin-top:10px;font-size:12.5px;color:var(--ink-soft)}
+.about .side p{margin:0 0 10px;font-size:13.5px;line-height:1.75;color:var(--ink)}
+.parts{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;counter-reset:part}
+.part{border-top:2px solid var(--ink);padding:12px 2px 4px;display:flex;flex-direction:column;gap:6px;counter-increment:part}
+.part::before{content:"0" counter(part);font-family:var(--f-label);font-size:11px;color:var(--ink-soft);letter-spacing:.1em}
+.part h3{margin:0;font-family:var(--f-display);font-size:16px}
+.part p{margin:0;font-size:13px;line-height:1.7;color:var(--ink)}
+.part .jump{margin-top:auto;font-family:var(--f-label);font-size:11px;letter-spacing:.06em;color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--rule);width:max-content;padding-top:6px}
+.part .jump:hover{color:var(--ink);border-color:var(--ink-soft)}
+.rules{grid-column:1/-1;border:1px solid var(--rule);padding:14px 18px;display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px 18px;font-size:13px;line-height:1.7}
+.rules dt{font-family:var(--f-label);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);padding-top:3px}
+.rules dd{margin:0}
+@media (max-width:900px){.about{grid-template-columns:1fr}.parts{grid-template-columns:1fr 1fr}.rules{grid-template-columns:1fr}}
+@media (max-width:520px){.parts{grid-template-columns:1fr}}
+.sync[data-state="warn"] .dot{background:#b0754f}
+.btn{border:1px solid var(--rule);background:var(--paper);padding:4px 10px;border-radius:2px;cursor:pointer;font-size:12px}
+.btn:hover{border-color:var(--ink-soft)}
+
+/* 섹션 머리 */
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--rule);padding-bottom:8px;margin-bottom:16px}
+.sec-head h2{margin:0;display:flex;align-items:baseline;gap:12px;font-weight:400}
+.sec-head h2 .ko{font-family:var(--f-display);font-size:19px;color:var(--ink);letter-spacing:0;text-transform:none}
+
+/* 지금 펼쳐 둔 책 */
+.reading{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.rcard{position:relative;display:flex;flex-direction:column;gap:8px;padding:16px 16px 14px 22px;background:var(--paper);border:1px solid var(--rule);text-align:left;cursor:pointer;min-height:168px}
+.rcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--tone,#c9b99a)}
+.rcard:hover{border-color:var(--ink-soft)}
+.rcard .no{font-family:var(--f-label);font-size:10px;letter-spacing:.14em;color:var(--ink-soft)}
+.rcard .t{font-family:var(--f-display);font-size:17px;font-weight:700;line-height:1.35;text-wrap:balance}
+.rcard .a{font-size:12.5px;color:var(--ink-soft)}
+.rcard .meta{margin-top:auto;display:flex;justify-content:space-between;gap:8px;font-family:var(--f-label);font-size:10.5px;color:var(--ink-soft);border-top:1px dashed var(--rule);padding-top:8px}
+
+/* 서가 */
+.shelf-area{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start}
+.controls{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chips .label{margin-right:6px;min-width:44px}
+.chip .sdot{display:inline-block;margin-right:5px}
+.chip{border:1px solid var(--rule);background:transparent;padding:3px 10px;border-radius:999px;font-size:12px;cursor:pointer;color:var(--ink-soft)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.chip .n{font-family:var(--f-label);font-size:10.5px;margin-left:4px;opacity:.8}
+select{font:inherit;font-size:12px;background:var(--paper);border:1px solid var(--rule);padding:3px 6px;color:var(--ink)}
+.shelf{display:flex;flex-wrap:wrap;padding:0 6px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 183px,var(--shelf) 183px,var(--shelf) 186px);min-height:186px}
+.slot{height:186px;display:flex;align-items:flex-end;padding:0 2px 3px}
+.spine{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:12px 0 8px;border:none;cursor:pointer;background:var(--tone);color:var(--ink);transition:transform .15s ease;box-shadow:inset -2px 0 0 rgba(0,0,0,.06),inset 2px 0 0 rgba(255,255,255,.25)}
+.spine::before,.spine::after{content:"";position:absolute;left:4px;right:4px;height:1px;background:rgba(42,44,47,.28)}
+.spine::before{top:6px}.spine::after{bottom:4px}
+.spine:hover{transform:translateY(-4px)}
+.spine[aria-current="true"]{transform:translateY(-10px);outline:2px solid var(--accent);outline-offset:1px}
+.spine .st{writing-mode:vertical-rl;text-orientation:mixed;font-family:var(--f-display);font-size:13px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-height:100%;flex:1}
+.spine .md{font-family:var(--f-label);font-size:8.5px;letter-spacing:.08em;margin-top:4px}
+.spine.wish{background:transparent;border:1px dashed var(--ink-soft);color:var(--ink-soft);box-shadow:none}
+.spine.stop{background-image:repeating-linear-gradient(135deg,rgba(42,44,47,.22) 0 2px,transparent 2px 7px);filter:grayscale(.85);color:var(--ink-soft)}
+.spine .ribbon{position:absolute;top:-9px;right:6px;width:7px;height:20px;background:var(--accent);clip-path:polygon(0 0,100% 0,100% 100%,50% 78%,0 100%)}
+.shelf-foot{display:flex;justify-content:space-between;margin-top:10px;font-size:12px;color:var(--ink-soft);gap:12px;flex-wrap:wrap}
+.legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.lg{display:inline-block;width:10px;height:14px;background:#c9b99a}
+.lg.wish{background:transparent;border:1px dashed var(--ink-soft)}
+.lg.stop{background-image:repeating-linear-gradient(135deg,rgba(42,44,47,.35) 0 1.5px,transparent 1.5px 4px);filter:grayscale(.85)}
+.lg.read{position:relative;background:#c9b99a}
+.lg.read::after{content:"";position:absolute;top:-4px;right:1px;width:4px;height:8px;background:var(--accent)}
+.empty{padding:40px 12px;color:var(--ink-soft);font-size:13px}
+
+/* 상세 */
+.detail{position:sticky;top:16px;border:1px solid var(--rule);background:var(--paper);display:flex;flex-direction:column}
+.detail .band{height:8px;background:var(--tone,#c9b99a)}
+.detail .body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px}
+.detail h3{margin:0;font-family:var(--f-display);font-size:21px;line-height:1.35;text-wrap:balance}
+.detail .by{color:var(--ink-soft);font-size:13px;margin-top:-6px}
+.rows{display:grid;grid-template-columns:64px 1fr;gap:6px 10px;font-size:13px;border-top:1px solid var(--rule);padding-top:10px}
+.rows dt{font-family:var(--f-label);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);padding-top:2px}
+.rows dd{margin:0;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:0 8px;font-size:12px}
+.quote{font-family:var(--f-display);font-size:14.5px;line-height:1.6;border-left:2px solid var(--rule);padding:2px 0 2px 12px;margin:0}
+.muted{color:var(--ink-soft);font-size:12.5px}
+.linked{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--rule);padding-top:10px}
+.linked a{display:flex;gap:8px;align-items:baseline;text-decoration:none;font-size:13px;line-height:1.45}
+.linked a:hover .lt{text-decoration:underline}
+.sdot{width:7px;height:7px;border-radius:50%;flex:none;transform:translateY(-1px)}
+.s-seed{background:var(--seed)}.s-grow{background:var(--grow)}.s-done{background:var(--done)}
+.open{align-self:flex-start;font-family:var(--f-label);font-size:11.5px;letter-spacing:.06em;text-decoration:none;border-bottom:1px solid var(--ink-soft);padding-bottom:1px}
+
+/* 개념 정원 */
+.garden-sum{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.bar{display:flex;height:10px;border:1px solid var(--rule)}
+.bar i{display:block;height:100%}
+.bar-legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px}
+.bar-legend span{display:inline-flex;align-items:center;gap:6px}
+.bar-legend b{font-family:var(--f-label);font-weight:500;font-variant-numeric:tabular-nums}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.cols.single{grid-template-columns:1fr}
+.cols.single .col-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));column-gap:18px}
+.col{display:flex;flex-direction:column;min-width:0}
+.col-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--ink);padding-bottom:6px;margin-bottom:4px}
+.col-head .ko{font-family:var(--f-display);font-size:15px}
+.col-list{display:flex;flex-direction:column;max-height:470px;overflow-y:auto;padding-right:4px}
+.card{display:flex;flex-direction:column;gap:3px;padding:10px 0;border-bottom:1px solid var(--rule);text-decoration:none}
+.card:hover .ct{text-decoration:underline}
+.card .ct{font-size:13.5px;line-height:1.45;font-weight:500}
+.card .cm{font-size:12px;color:var(--ink-soft);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .cb{font-family:var(--f-label);font-size:10.5px;color:var(--ink-soft);letter-spacing:.02em}
+.col-empty{padding:16px 0;color:var(--ink-soft);font-size:12.5px;line-height:1.6}
+
+/* 사유의 단면 — 한 기간을 접어 본 '보고서' 한 장: 회색 종이 판, 큰 숫자, 한 줄짜리 목록 */
+.retro{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:26px 34px;background:var(--paper-2);border:1px solid var(--rule);padding:22px 24px 24px}
+.retro-head{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:12px 40px;align-items:flex-end;border-bottom:1px solid var(--rule);padding-bottom:16px}
+.retro-head .pl{font-family:var(--f-display);font-size:20px;font-weight:700;margin-right:auto}
+.retro-head .big{display:flex;flex-direction:column;gap:0;align-items:flex-start}
+.retro-head .big b{font-family:var(--f-label);font-weight:500;font-size:30px;line-height:1.1;font-variant-numeric:tabular-nums}
+.rs-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.rs{display:grid;grid-template-columns:50px 84px minmax(0,1fr);gap:2px 12px;padding:7px 0;border-bottom:1px dashed var(--rule);align-items:baseline}
+.rs .rd{font-family:var(--f-label);font-size:11px;color:var(--ink-soft)}
+.rs .rk{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-soft)}
+.rs .rk::before{content:"";width:8px;height:8px;background:var(--k);flex:none}
+.rs .rt{font-size:13px;line-height:1.5;min-width:0}
+.rs .rq{grid-column:3;font-size:12px;color:var(--ink-soft);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs a{text-decoration:none}.rs a:hover{text-decoration:underline}
+.side-blocks{display:flex;flex-direction:column;gap:22px}
+.sb .label{display:block;margin-bottom:8px}
+.tcloud{display:flex;flex-wrap:wrap;gap:6px}
+.tcloud span{font-size:12px;border:1px solid var(--rule);background:var(--paper);padding:1px 9px;border-radius:2px}
+.tcloud b{font-family:var(--f-label);font-weight:500;font-size:11px;color:var(--ink-soft);margin-left:5px}
+.sb ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.45}
+.sb li a{text-decoration:none}.sb li a:hover{text-decoration:underline}
+.sb li .n{font-family:var(--f-label);font-size:11px;color:var(--ink-soft);margin-left:6px}
+
+/* 사유의 변곡점 — 종이 위에 그은 시간선: 굵은 선, 큰 마디, 날짜가 앞에 선다 */
+.turn-sum{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
+.momentum{display:flex;flex-direction:column;gap:2px;max-width:520px}
+.mom{display:grid;grid-template-columns:96px 1fr 24px;align-items:center;gap:10px;border:none;background:transparent;padding:3px 0;cursor:pointer;text-align:left;font-size:12.5px;color:var(--ink)}
+.mom .mb{height:8px;border:1px solid var(--rule);display:block}
+.mom .mb i{display:block;height:100%;background:var(--accent);opacity:.5}
+.mom[aria-pressed="true"] .mb i{opacity:1}
+.mom[aria-pressed="true"] .ml{font-weight:500;text-decoration:underline}
+.mom b{font-family:var(--f-label);font-weight:500;font-size:12px;text-align:right;font-variant-numeric:tabular-nums}
+.tl{list-style:none;margin:0;padding:0 0 0 22px;position:relative;display:flex;flex-direction:column}
+.tl::before{content:"";position:absolute;left:5px;top:10px;bottom:10px;width:2px;background:var(--accent);opacity:.35}
+.tp{position:relative;padding:4px 0 30px;display:grid;grid-template-columns:110px minmax(0,1fr);gap:4px 20px}
+.tp::before{content:"";position:absolute;left:-23px;top:5px;width:14px;height:14px;border-radius:50%;background:var(--paper);border:3px solid var(--k);box-sizing:border-box;box-shadow:0 0 0 3px var(--paper)}
+.tp .side{display:flex;flex-direction:column;gap:6px}
+.tp .when{font-family:var(--f-label);font-size:14px;font-weight:500;color:var(--ink);letter-spacing:.02em;line-height:1.3}
+.tp .kind{display:inline-block;font-size:11px;border:1px solid var(--k);color:var(--k);border-radius:999px;padding:0 8px;width:max-content}
+.tp .main{display:flex;flex-direction:column;gap:8px;min-width:0}
+.tp .quote{font-size:15.5px;border-left:3px solid var(--k);padding-left:14px}
+.tp .tt{font-family:var(--f-display);font-size:17px;font-weight:700;line-height:1.45;text-decoration:none;text-wrap:balance}
+.tp .tt:hover{text-decoration:underline}
+.tp .moved{font-size:13px;line-height:1.65}
+.tp .cl{display:block;margin-top:6px;color:var(--ink-soft);font-size:12.5px;border-left:2px dotted var(--rule);padding-left:10px}
+.tp .cl .label{margin-right:6px}
+.meta2{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:12px;color:var(--ink-soft)}
+.meta2 a{text-decoration:none;display:inline-flex;align-items:baseline;gap:6px}
+.meta2 a:hover{text-decoration:underline}
+.tag{font-family:var(--f-label);font-size:10.5px;border:1px solid var(--rule);padding:0 6px;border-radius:2px;color:var(--ink)}
+
+@media (max-width:900px){
+  .shelf-area{grid-template-columns:1fr}
+  .detail{position:static}
+  .cols{grid-template-columns:1fr}
+  .col-list{max-height:none}
+  .tp{grid-template-columns:1fr}
+  .retro{grid-template-columns:1fr}
+  .tp .side{flex-direction:row;align-items:center}
+}
+@media (max-width:600px){
+  .rs{grid-template-columns:44px minmax(0,1fr)}
+  .rs .rk{grid-column:2}.rs .rt,.rs .rq{grid-column:2}
+  .retro{padding:16px}
+}
+@media (max-width:420px){
+  .wrap{padding:20px 16px 48px}
+  h1{font-size:23px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="mast-top">
+      <div class="mast-title">
+        <a class="label" href="../" style="text-decoration:none">← 밍지 · 작업 모음</a>
+        <span class="label">Alexandria Library · Reading &amp; Thinking Archive</span>
+        <h1>밍지의 알렉산드리아 도서관</h1>
+      </div>
+      <div class="today" id="today"></div>
+    </div>
+    <div class="mast-bottom">
+      <div class="stats" id="stats"></div>
+      <div class="sync" id="sync" data-state="snap"><span class="dot"></span><span id="syncText">{{DOT_DATE}} 기록 기준 · 노션 데이터베이스 세 곳에서 매일 옮겨 오는 공개본</span><span id="syncAct"></span></div>
+    </div>
+  </header>
+
+
+  <section aria-labelledby="h-about">
+    <div class="sec-head">
+      <h2 id="h-about"><span class="label">About</span><span class="ko">이 아카이브에 대하여</span></h2>
+    </div>
+    <div class="about">
+      <div>
+        <p class="lead">책과 영화와 유물 및 유적과 영상, 강연 등을 토대로 떠오르는 사유를 정리하고 사유의 씨앗을 키워갑니다.</p>
+        <span class="lead-by">— 프로젝트 소개, 밍지</span>
+      </div>
+      <div class="side">
+        <p>이 페이지는 노션에 쌓아 온 독서·사유 기록을 한 장으로 펼쳐 본 로비입니다. 무엇을 읽었는지보다, 읽은 것에서 어떤 생각이 나왔고 그 생각이 시간이 지나며 어떻게 자랐는지를 따라가도록 짰습니다.</p>
+        <p>기록은 노션 데이터베이스 세 곳에 나뉘어 있고, 서로 관계로 이어져 있습니다. 이 공개본은 매일 한 번 노션에서 기록을 새로 옮겨 오며, 지금 보이는 내용은 {{KO_DATE}} 기준입니다.</p>
+      </div>
+      <div class="parts">
+        <div class="part"><h3>한 서가, 여러 매체</h3><p>책뿐 아니라 영화·유물·유튜브·강연을 같은 서가에 꽂고 '매체'로만 구분합니다. 여행에서 얻은 생각도 '여행'이 아니라 직접 본 유물로 기록해, 사유의 출처를 행위가 아니라 대상으로 잡습니다.</p><a class="jump" href="#h-shelf">서가 보기 ↓</a></div>
+        <div class="part"><h3>책이 아닌 개념 단위</h3><p>읽은 것에서 한 문장으로 설 수 있는 명제만 골라 개념 카드로 만듭니다. 카드는 다른 책·매체와 이어지며 씨앗, 자라는 중, 정리됨 세 단계로 자랍니다.</p><a class="jump" href="#h-garden">개념 정원 보기 ↓</a></div>
+        <div class="part"><h3>생각이 움직인 순간</h3><p>카드가 무엇을 말하는지와 별도로, 생각이 언제·무엇 때문에·어떻게 움직였는지를 한 줄씩 남깁니다. 변화는 심음, 다시 말하기, 확장, 교차, 전환 다섯 가지로 나눕니다.</p><a class="jump" href="#h-turn">변곡점 보기 ↓</a></div>
+        <div class="part"><h3>기간으로 접어 보기</h3><p>한 달, 한 분기, 한 해 단위로 무엇을 읽고, 어떤 생각을 심고, 어떤 생각이 움직였는지를 한 장의 보고서처럼 모아 봅니다.</p><a class="jump" href="#h-retro">사유의 단면 보기 ↓</a></div>
+      </div>
+      <dl class="rules">
+        <dt>Claude와 일하는 법</dt>
+        <dd>읽고 나눈 대화에서 카드 감이 보이면 Claude가 먼저 제안하고, 만들지 말지는 밍지가 정합니다. 카드의 '나의 사유'와 변곡점의 '그때의 문장'에는 밍지가 실제로 한 말만 넣고, Claude가 잇거나 해석한 내용은 「Claude 연결」 표시로 따로 구분합니다.</dd>
+        <dt>성장 판정</dt>
+        <dd>카드의 단계를 옮기는 것은 언제나 밍지의 판단입니다. 변곡점 기록은 그 판단의 근거로만 참고합니다.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-reading">
+    <div class="sec-head">
+      <h2 id="h-reading"><span class="label">Now Reading</span><span class="ko">지금 펼쳐 둔 책</span></h2>
+      <span class="label" id="readingCount"></span>
+    </div>
+    <div class="reading" id="reading"></div>
+  </section>
+
+  <section aria-labelledby="h-retro">
+    <div class="sec-head">
+      <h2 id="h-retro"><span class="label">Retrospect</span><span class="ko">사유의 단면</span></h2>
+      <div class="chips" id="periodChips" role="group" aria-label="기간 고르기"></div>
+    </div>
+    <div class="retro" id="retro"></div>
+  </section>
+
+  <section aria-labelledby="h-turn">
+    <div class="sec-head">
+      <h2 id="h-turn"><span class="label">Turning Points</span><span class="ko">사유의 변곡점</span></h2>
+      <label class="label" for="turnSort">순서
+        <select id="turnSort">
+          <option value="recent">최근부터</option>
+          <option value="old">처음부터</option>
+        </select>
+      </label>
+    </div>
+    <div class="turn-sum">
+      <span class="label">무엇이 나를 움직였나</span>
+      <div class="momentum" id="momentum"></div>
+      <div class="chips" id="kindChips" role="group" aria-label="변화의 종류로 걸러 보기"></div>
+      <span class="muted" id="turnFilterNote"></span>
+    </div>
+    <ol class="tl" id="timeline"></ol>
+  </section>
+
+  <section aria-labelledby="h-shelf">
+    <div class="sec-head">
+      <h2 id="h-shelf"><span class="label">Shelf</span><span class="ko">전체 서가</span></h2>
+      <label class="label" for="sort">정렬
+        <select id="sort">
+          <option value="recent">최근 읽은 순</option>
+          <option value="reg">등록 순</option>
+          <option value="title">제목 순</option>
+          <option value="rating">별점 높은 순</option>
+        </select>
+      </label>
+    </div>
+    <div class="shelf-area">
+      <div>
+        <div class="controls">
+          <div class="chips" id="statusChips" role="group" aria-label="상태로 걸러 보기"></div>
+          <div class="chips" id="mediumChips" role="group" aria-label="매체로 걸러 보기"></div>
+        </div>
+        <div class="shelf" id="shelf"></div>
+        <div class="shelf-foot">
+          <span id="shelfCount"></span>
+          <span class="legend">
+            <span><i class="lg read"></i>읽는 중</span>
+            <span><i class="lg wish"></i>읽고 싶은 책</span>
+            <span><i class="lg stop"></i>중단</span>
+          </span>
+        </div>
+      </div>
+      <aside class="detail" id="detail" aria-live="polite"></aside>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-garden">
+    <div class="sec-head">
+      <h2 id="h-garden"><span class="label">Garden</span><span class="ko">개념 정원</span></h2>
+      <span class="label" id="gardenCount"></span>
+    </div>
+    <div class="garden-sum">
+      <div class="bar" id="bar" aria-hidden="true"></div>
+      <div class="bar-legend" id="barLegend"></div>
+      <div class="chips" id="stageChips" role="group" aria-label="자란 정도로 걸러 보기"></div>
+      <div class="chips" id="themeChips" role="group" aria-label="주제로 걸러 보기"></div>
+    </div>
+    <div class="cols" id="cols"></div>
+  </section>
+
+
+</div>
+
+<script>
+const SNAP_BOOKS = /*__BOOKS__*/[];
+const SNAP_CONCEPTS = /*__CONCEPTS__*/[];
+
+const SNAP_TURNS = /*__TURNS__*/[];
+
+const SNAP_NOW = /*__NOW__*/"2026-11-19T12:00:00+09:00";
+const NOTION = "Notion";
+const TOOL = "notion-query-data-sources";
+const BOOKS_DS = "collection://dfb385d4-963b-406e-835f-58b068d05df5";
+const CONCEPTS_DS = "collection://a73b4803-6558-49e8-9817-aef1f8b9fe03";
+const BOOKS_Q = {data:{data_source_urls:[BOOKS_DS],query:'SELECT url, "이름", "저자", "상태", "매체", "분류", "별점", "한 줄 평", "date:읽은 기간:start" AS s, "date:읽은 기간:end" AS e, "등록일" FROM "'+BOOKS_DS+'"'}};
+const CONCEPTS_Q = {data:{data_source_urls:[CONCEPTS_DS],query:'SELECT url, "개념", "상태", "한 줄 요지", "나의 사유", "출처 책", "주제", "등록일", "date:사유한 날:start" AS td FROM "'+CONCEPTS_DS+'"'}};
+
+const TURNS_DS = "collection://41ce61bb-cd98-8182-a454-000b9f53ec4f";
+const TURNS_Q = {data:{data_source_urls:[TURNS_DS],query:'SELECT url, createdTime AS ct, "변곡점", "date:날짜:start" AS d, "개념 카드", "그때의 문장", "변화의 종류", "계기", "계기 출처", "무엇이 움직였나" FROM "'+TURNS_DS+'"'}};
+const KINDS = [["심음","#6e8668"],["다시 말하기","#465a72"],["확장","#9a8248"],["교차","#7d6d93"],["전환","#a5604f"]];
+const CAUSES = ["새 책·매체","대화","내 경험","회상","지난 글","카드 간 충돌"];
+
+const TONES = ["#cdbd9d","#a9b5a2","#bba9a2","#a3b3bf","#c7ad90","#ada7bb","#c0b89c","#9caba3","#c4b0ae","#adb9a8","#b9b0c4","#c9c09f"];
+const STAGES = [["씨앗","seed","Seed"],["자라는 중","grow","Growing"],["정리됨","done","Settled"]];
+const STATUS_ORDER = ["읽는 중","완독","독서노트","서평쓰기","서평완료","읽고 싶은 책","소장","중단","번역"];
+
+const state = {books:[], concepts:[], turns:[], turnKind:"전체", turnCause:"전체", turnSort:"recent", period:"month", status:"전체", medium:"전체", theme:"전체", stage:"전체", sort:"recent", selected:null};
+
+function idOf(u){const m=String(u||"").match(/([0-9a-f]{32})/i);return m?m[1].toLowerCase():String(u||"");}
+function arr(v){if(Array.isArray(v))return v;if(typeof v==="string"&&v.trim().startsWith("[")){try{return JSON.parse(v);}catch(e){}}return v?[v]:[];}
+function hash(s){let h=0;for(const c of String(s))h=(h*31+c.codePointAt(0))>>>0;return h;}
+function tone(cat){return TONES[hash(cat||"미분류")%TONES.length];}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function dot(d){return d?String(d).slice(0,10).replace(/-/g,"."):"";}
+function stars(r){if(!r)return 0;let n=0;for(const c of r){if(c==="★")n+=1;else if(c==="☆")n+=.5;}return n;}
+
+function normBooks(rows){return rows.map(r=>({
+  id:idOf(r.url),url:r.url,title:r["이름"]||"(제목 없음)",author:r["저자"]||"",status:r["상태"]||"미분류",
+  medium:r["매체"]||"책",cat:r["분류"]||"",rating:r["별점"]||"",note:r["한 줄 평"]||"",
+  s:r.s||r["date:읽은 기간:start"]||"",e:r.e||r["date:읽은 기간:end"]||"",reg:r["등록일"]||""
+}));}
+function normConcepts(rows){return rows.map(r=>({
+  id:idOf(r.url),url:r.url,title:r["개념"]||"(제목 없음)",stage:r["상태"]||"씨앗",gist:r["한 줄 요지"]||"",
+  mine:r["나의 사유"]||"",books:arr(r["출처 책"]).map(idOf),themes:arr(r["주제"]),reg:r["등록일"]||"",td:r.td||r["date:사유한 날:start"]||""
+}));}
+
+function normTurns(rows){return rows.map(r=>({
+  id:idOf(r.url),url:r.url,title:r["변곡점"]||"(제목 없음)",d:r.d||r["date:날짜:start"]||"",ct:r.ct||r.createdTime||"",
+  cards:arr(r["개념 카드"]).map(idOf),said:r["그때의 문장"]||"",kind:r["변화의 종류"]||"",
+  causes:arr(r["계기"]),srcs:arr(r["계기 출처"]).map(idOf),moved:r["무엇이 움직였나"]||""
+}));}
+function kindColor(k){const f=KINDS.find(x=>x[0]===k);return f?f[1]:"#8d8678";}
+function conceptById(id){return state.concepts.find(c=>c.id===id);}
+function movedHtml(s){
+  const mark="(Claude 연결)";const i=s.indexOf(mark);
+  if(i<0)return esc(s);
+  const a=s.slice(0,i).trim(),b=s.slice(i+mark.length).trim();
+  return (a?esc(a):"")+`<span class="cl"><span class="label">Claude 연결</span>${esc(b)}</span>`;
+}
+
+function bookById(id){return state.books.find(b=>b.id===id);}
+function cardsOf(bookId){return state.concepts.filter(c=>c.books.includes(bookId));}
+function readKey(b){return b.s||b.reg||"";}
+
+/* ---------- 머리띠 ---------- */
+function renderMast(){
+  const d=new Date(SNAP_NOW);const days=["SUN","MON","TUE","WED","THU","FRI","SAT"];
+  document.getElementById("today").textContent=d.getFullYear()+"."+String(d.getMonth()+1).padStart(2,"0")+"."+String(d.getDate()).padStart(2,"0")+" "+days[d.getDay()];
+  const fin=state.books.filter(b=>b.status==="완독").length;
+  const rd=state.books.filter(b=>b.status==="읽는 중").length;
+  document.getElementById("stats").innerHTML=[["Entries",state.books.length],["Finished",fin],["Reading",rd],["Cards",state.concepts.length],["Turns",state.turns.length]]
+    .map(([k,v])=>`<span class="stat"><span class="label">${k}</span><b>${v}</b></span>`).join("");
+}
+
+/* ---------- 지금 펼쳐 둔 책 ---------- */
+function renderReading(){
+  const list=state.books.filter(b=>b.status==="읽는 중").sort((a,b)=>readKey(b).localeCompare(readKey(a)));
+  document.getElementById("readingCount").textContent=list.length+" books";
+  const el=document.getElementById("reading");
+  if(!list.length){el.innerHTML='<p class="empty">지금 읽는 중으로 표시된 책이 없습니다.</p>';return;}
+  el.innerHTML=list.map((b,i)=>{
+    const n=cardsOf(b.id).length;
+    return `<button class="rcard" style="--tone:${tone(b.cat)}" data-id="${b.id}" aria-label="${esc(b.title)} 자세히 보기">
+      <span class="no">No.${String(i+1).padStart(2,"0")} · ${esc(b.cat||"분류 없음")}</span>
+      <span class="t">${esc(b.title)}</span>
+      <span class="a">${esc(b.author)}</span>
+      <span class="meta"><span>${b.s?"시작 "+dot(b.s):"시작일 미기록"}</span><span>${n?"카드 "+n+"장":""}</span></span>
+    </button>`;}).join("");
+  el.querySelectorAll(".rcard").forEach(c=>c.addEventListener("click",()=>{select(c.dataset.id,true);}));
+}
+
+/* ---------- 서가 ---------- */
+function chipRow(elId,label,values,current,key){
+  const el=document.getElementById(elId);
+  el.innerHTML=`<span class="label">${label}</span>`+values.map(([v,n])=>`<button class="chip" aria-pressed="${v===current}" data-v="${esc(v)}">${esc(v)}<span class="n">${n}</span></button>`).join("");
+  el.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{state[key]=c.dataset.v;renderShelf();}));
+}
+function counts(list,f){const m=new Map();list.forEach(x=>{const k=f(x);m.set(k,(m.get(k)||0)+1);});return m;}
+function renderShelf(){
+  const all=state.books;
+  const sc=counts(all,b=>b.status);
+  const statuses=[["전체",all.length],...STATUS_ORDER.filter(s=>sc.has(s)).map(s=>[s,sc.get(s)]),...[...sc.keys()].filter(s=>!STATUS_ORDER.includes(s)).map(s=>[s,sc.get(s)])];
+  chipRow("statusChips","상태",statuses,state.status,"status");
+  const byStatus=all.filter(b=>state.status==="전체"||b.status===state.status);
+  const mc=counts(byStatus,b=>b.medium);
+  const mediums=[["전체",byStatus.length],...[...mc.entries()].sort((a,b)=>b[1]-a[1])];
+  if(state.medium!=="전체"&&!mc.has(state.medium))state.medium="전체";
+  chipRow("mediumChips","매체",mediums,state.medium,"medium");
+
+  let list=byStatus.filter(b=>state.medium==="전체"||b.medium===state.medium);
+  const s=state.sort;
+  list=list.slice().sort((a,b)=>{
+    if(s==="title")return a.title.localeCompare(b.title,"ko");
+    if(s==="reg")return (b.reg||"").localeCompare(a.reg||"");
+    if(s==="rating")return stars(b.rating)-stars(a.rating)||readKey(b).localeCompare(readKey(a));
+    return readKey(b).localeCompare(readKey(a));
+  });
+  const el=document.getElementById("shelf");
+  if(!list.length){el.innerHTML='<p class="empty">이 조건에 맞는 항목이 없습니다.</p>';}
+  else el.innerHTML=list.map(b=>{
+    const h=124+(hash(b.title)%5)*11;
+    const w=Math.round(34+Math.min([...b.title].length,22)*0.55);
+    const cls=["spine"];if(b.status==="읽고 싶은 책")cls.push("wish");if(b.status==="중단")cls.push("stop");
+    const md=b.medium==="영화"?"FILM":b.medium==="유튜브"?"VIDEO":b.medium==="강연"?"TALK":b.medium==="유물"?"RELIC":"";
+    return `<div class="slot"><button class="${cls.join(" ")}" style="--tone:${tone(b.cat)};height:${h}px;width:${w}px" data-id="${b.id}" aria-current="${state.selected===b.id}" aria-label="${esc(b.title)}, ${esc(b.status)}" title="${esc(b.title)}">
+      ${b.status==="읽는 중"?'<span class="ribbon" aria-hidden="true"></span>':""}
+      <span class="st">${esc(b.title)}</span>${md?`<span class="md">${md}</span>`:""}
+    </button></div>`;}).join("");
+  el.querySelectorAll(".spine").forEach(sp=>sp.addEventListener("click",()=>select(sp.dataset.id,false)));
+  document.getElementById("shelfCount").textContent=list.length+"권 꽂혀 있음 · 책등을 누르면 오른쪽에 펼쳐집니다";
+}
+function select(id,scroll){
+  state.selected=id;
+  document.querySelectorAll(".spine").forEach(sp=>sp.setAttribute("aria-current",String(sp.dataset.id===id)));
+  renderDetail();
+  if(scroll)document.getElementById("h-shelf").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+}
+function renderDetail(){
+  const el=document.getElementById("detail");
+  const b=bookById(state.selected);
+  if(!b){el.innerHTML='<div class="body"><p class="muted">책등을 누르면 이곳에 펼쳐집니다.</p></div>';return;}
+  const cards=cardsOf(b.id);
+  const moved=state.turns.filter(t=>t.srcs.includes(b.id));
+  const period=b.s?(dot(b.s)+(b.e&&b.e!==b.s?" – "+dot(b.e):"")):"기록 없음";
+  el.style.setProperty("--tone",tone(b.cat));
+  el.innerHTML=`<div class="band"></div><div class="body">
+    <span class="label">${esc(b.medium)} · ${esc(b.cat||"분류 없음")}</span>
+    <h3>${esc(b.title)}</h3>
+    <div class="by">${esc(b.author)}</div>
+    <dl class="rows">
+      <dt>상태</dt><dd><span class="pill">${esc(b.status)}</span></dd>
+      <dt>읽은 날</dt><dd>${period}</dd>
+      <dt>별점</dt><dd>${b.rating?esc(b.rating):'<span class="muted">없음</span>'}</dd>
+    </dl>
+    ${b.note?`<p class="quote">${esc(b.note)}</p>`:'<p class="muted">한 줄 평이 아직 없습니다.</p>'}
+    <div class="linked">
+      <span class="label">이 책에서 나온 개념 카드 ${cards.length}장</span>
+      ${cards.length?cards.map(c=>`<a href="${esc(c.url)}" target="_blank" rel="noopener"><span class="sdot s-${stageKey(c.stage)}" aria-hidden="true"></span><span class="lt">${esc(c.title)}</span></a>`).join(""):'<span class="muted">아직 이 책을 출처로 단 카드가 없습니다.</span>'}
+    </div>
+    ${moved.length?`<div class="linked"><span class="label">이 책이 움직인 사유 ${moved.length}번</span>${moved.map(t=>`<a href="${esc(t.url)}" target="_blank" rel="noopener"><span class="sdot" style="background:${kindColor(t.kind)}" aria-hidden="true"></span><span class="lt">${esc(t.title)}</span></a>`).join("")}</div>`:""}
+  </div>`;
+}
+
+/* ---------- 개념 정원 ---------- */
+function stageKey(s){const f=STAGES.find(x=>x[0]===s);return f?f[1]:"seed";}
+function renderGarden(){
+  const all=state.concepts;
+  document.getElementById("gardenCount").textContent=all.length+" cards";
+  const tc=counts(all.flatMap(c=>c.themes.map(t=>({t}))),x=>x.t);
+  const themes=[["전체",all.length],...[...tc.entries()].sort((a,b)=>b[1]-a[1])];
+  const el=document.getElementById("themeChips");
+  el.innerHTML='<span class="label">주제</span>'+themes.map(([v,n])=>`<button class="chip" aria-pressed="${v===state.theme}" data-v="${esc(v)}">${esc(v)}<span class="n">${n}</span></button>`).join("");
+  el.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{state.theme=c.dataset.v;renderGarden();}));
+
+  const byTheme=all.filter(c=>state.theme==="전체"||c.themes.includes(state.theme));
+  const sel=document.getElementById("stageChips");
+  sel.innerHTML='<span class="label">단계</span>'+[["전체",byTheme.length,""],...STAGES.map(([k,key])=>[k,byTheme.filter(c=>c.stage===k).length,key])].map(([v,n,key])=>`<button class="chip" aria-pressed="${v===state.stage}" data-v="${esc(v)}">${key?`<span class="sdot s-${key}" aria-hidden="true"></span>`:""}${esc(v)}<span class="n">${n}</span></button>`).join("");
+  sel.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{state.stage=c.dataset.v;renderGarden();}));
+  const list=byTheme;
+  const total=list.length||1;
+  document.getElementById("bar").innerHTML=STAGES.map(([k,key])=>{const n=list.filter(c=>c.stage===k).length;return n?`<i style="width:${n/total*100}%;background:var(--${key})"></i>`:"";}).join("");
+  document.getElementById("barLegend").innerHTML=STAGES.map(([k,key])=>`<span><span class="sdot s-${key}"></span>${k}<b>${list.filter(c=>c.stage===k).length}</b></span>`).join("");
+
+  const shown=STAGES.filter(([k])=>state.stage==="전체"||k===state.stage);
+  document.getElementById("cols").className="cols"+(shown.length===1?" single":"");
+  document.getElementById("cols").innerHTML=shown.map(([k,key,en])=>{
+    const cs=list.filter(c=>c.stage===k).sort((a,b)=>(b.reg||"").localeCompare(a.reg||""));
+    const body=cs.length?cs.map(c=>{
+      const src=c.books.map(id=>bookById(id)).filter(Boolean).map(b=>b.title);
+      const tn=state.turns.filter(t=>t.cards.includes(c.id)).length;
+      return `<a class="card" href="${esc(c.url)}" target="_blank" rel="noopener">
+        <span class="ct">${esc(c.title)}</span>
+        ${c.mine?`<span class="cm">${esc(c.mine)}</span>`:""}
+        <span class="cb">${src.length?esc(src.join(" · ")):"출처 미연결"} · ${dot(c.reg)}${tn?` · 변곡 ${tn}`:""}</span>
+      </a>`;}).join("")
+      :`<p class="col-empty">${k==="정리됨"?"아직 정리됨으로 굳은 카드가 없습니다. 독후감이나 종합 작업에서 명제가 더는 흔들리지 않게 되면 이 칸으로 옮겨집니다.":"이 주제에는 해당 카드가 없습니다."}</p>`;
+    return `<div class="col"><div class="col-head"><span class="ko">${k}</span><span class="label">${en} · ${cs.length}</span></div><div class="col-list">${body}</div></div>`;
+  }).join("");
+}
+
+/* ---------- 사유의 단면 (기간별 회고) ---------- */
+const PERIODS=[["month","이번 달"],["quarter","이번 분기"],["year","올해"],["all","전체"]];
+function periodRange(p){
+  const n=new Date(SNAP_NOW),y=n.getFullYear(),m=n.getMonth(),pad=x=>String(x).padStart(2,"0");
+  if(p==="month")return [`${y}-${pad(m+1)}-01`,`${y}-${pad(m+1)}-31`,`${y}년 ${m+1}월`];
+  if(p==="quarter"){const q=Math.floor(m/3);return [`${y}-${pad(q*3+1)}-01`,`${y}-${pad(q*3+3)}-31`,`${y}년 ${q+1}분기 (${q*3+1}–${q*3+3}월)`];}
+  if(p==="year")return [`${y}-01-01`,`${y}-12-31`,`${y}년`];
+  return ["0000-00-00","9999-99-99","전체 기간"];
+}
+function inR(d,r){d=String(d||"").slice(0,10);return !!d&&d>=r[0]&&d<=r[1];}
+function addDays(iso,n){const t=new Date(String(iso).slice(0,10)+"T00:00:00Z");if(isNaN(t))return "";t.setUTCDate(t.getUTCDate()+n);return t.toISOString().slice(0,10);}
+/* 그 생각을 실제로 한 날: '사유한 날'이 있으면 그 날, 없으면 출처 책을 다 읽은 게 등록보다 30일 넘게 앞서면(예전 독후감에서 옮긴 카드) 그 읽은 날, 아니면 등록일 */
+function thoughtDate(c){
+  if(c.td)return String(c.td).slice(0,10);
+  const reg=String(c.reg||"").slice(0,10);
+  const ds=c.books.map(bookById).filter(Boolean).map(b=>String(b.e||b.s||"").slice(0,10)).filter(Boolean).sort();
+  if(ds.length){const last=ds[ds.length-1];if(last<addDays(reg,-30))return last;}
+  return reg;
+}
+function renderRetro(){
+  const pc=document.getElementById("periodChips");
+  pc.innerHTML=PERIODS.map(([k,v])=>`<button class="chip" aria-pressed="${k===state.period}" data-v="${k}">${v}</button>`).join("");
+  pc.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{state.period=c.dataset.v;renderRetro();}));
+  const [a,b,label]=periodRange(state.period);const R=[a,b];
+  const cards=state.concepts.filter(c=>inR(thoughtDate(c),R));
+  const turns=state.turns.filter(t=>inR(t.d,R)&&t.kind!=="심음");
+  const books=state.books.filter(bk=>inR(bk.e,R)||inR(bk.s,R));
+  const el=document.getElementById("retro");
+  const head=`<div class="retro-head"><span class="pl">${esc(label)}</span>
+    <span class="big"><b>${books.length}</b><span class="label">읽고 본 것</span></span>
+    <span class="big"><b>${cards.length}</b><span class="label">심은 생각</span></span>
+    <span class="big"><b>${turns.length}</b><span class="label">움직인 생각</span></span></div>`;
+  if(!cards.length&&!turns.length&&!books.length){el.innerHTML=head+'<p class="empty" style="grid-column:1/-1">이 기간에 기록된 사유가 없습니다.</p>';return;}
+  const entries=[
+    ...cards.map(c=>({d:thoughtDate(c),kind:"심음",title:c.title,url:c.url,q:(c.mine&&!String(c.mine).startsWith("(화두)"))?c.mine:"",note:""})),
+    ...turns.map(t=>{const c=conceptById(t.cards[0]);return {d:t.d,kind:t.kind,title:c?c.title:t.title,url:c?c.url:t.url,q:t.said,note:t.title};})
+  ].sort((x,y)=>String(y.d).localeCompare(String(x.d)));
+  const ids=new Set([...cards.map(c=>c.id),...turns.flatMap(t=>t.cards)]);
+  const tm=new Map();[...ids].map(conceptById).filter(Boolean).forEach(c=>c.themes.forEach(t=>tm.set(t,(tm.get(t)||0)+1)));
+  const themes=[...tm.entries()].sort((x,y)=>y[1]-x[1]);const tmax=Math.max(1,...tm.values());
+  const mv=new Map();turns.forEach(t=>t.cards.forEach(id=>mv.set(id,(mv.get(id)||0)+1)));
+  const moved=[...mv.entries()].sort((x,y)=>y[1]-x[1]).slice(0,3).map(([id,n])=>[conceptById(id),n]).filter(([c])=>c);
+  el.innerHTML=head+`
+  <div><span class="label" style="display:block;margin-bottom:4px">이 기간의 나의 생각</span>
+    <ol class="rs-list">${entries.length?entries.map(e=>`<li class="rs" style="--k:${kindColor(e.kind)}">
+      <span class="rd">${dot(e.d).slice(5)}</span>
+      <span class="rk">${esc(e.kind)}</span>
+      <span class="rt"><a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.title)}</a></span>
+      ${e.q?`<p class="rq" title="${esc(e.q)}">“${esc(e.q)}”</p>`:""}
+    </li>`).join(""):'<li class="empty">이 기간에 심거나 움직인 생각이 없습니다.</li>'}</ol>
+  </div>
+  <div class="side-blocks">
+    <div class="sb"><span class="label">많이 머문 주제</span>${themes.length?`<div class="tcloud">${themes.map(([t,n])=>`<span>${esc(t)}<b>${n}</b></span>`).join("")}</div>`:'<p class="muted">없음</p>'}</div>
+    <div class="sb"><span class="label">가장 많이 움직인 카드</span>${moved.length?`<ul>${moved.map(([c,n])=>`<li><a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.title)}</a><span class="n">${n}번</span></li>`).join("")}</ul>`:'<p class="muted">이 기간에 움직인 카드가 없습니다.</p>'}</div>
+    <div class="sb"><span class="label">이 기간에 읽고 본 것</span>${books.length?`<ul>${books.sort((x,y)=>readKey(y).localeCompare(readKey(x))).map(bk=>`<li><a href="${esc(bk.url)}" target="_blank" rel="noopener">${esc(bk.title)}</a><span class="n">${esc(bk.medium)}</span></li>`).join("")}</ul>`:'<p class="muted">없음</p>'}</div>
+  </div>`;
+}
+
+/* ---------- 사유의 변곡점 ---------- */
+function renderTurns(){
+  const all=state.turns;
+  const kc=counts(all,t=>t.kind);
+  const kel=document.getElementById("kindChips");
+  kel.innerHTML='<span class="label">종류</span>'+[["전체",all.length,""],...KINDS.filter(([k])=>kc.has(k)).map(([k,col])=>[k,kc.get(k),col])].map(([v,n,col])=>`<button class="chip" aria-pressed="${v===state.turnKind}" data-v="${esc(v)}">${col?`<span class="sdot" style="background:${col}" aria-hidden="true"></span>`:""}${esc(v)}<span class="n">${n}</span></button>`).join("");
+  kel.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{state.turnKind=c.dataset.v;renderTurns();}));
+
+  const cc=new Map();all.forEach(t=>t.causes.forEach(x=>cc.set(x,(cc.get(x)||0)+1)));
+  const causes=[...CAUSES.filter(c=>cc.has(c)),...[...cc.keys()].filter(c=>!CAUSES.includes(c))];
+  const max=Math.max(1,...cc.values());
+  const mel=document.getElementById("momentum");
+  mel.innerHTML=causes.length?causes.map(c=>`<button class="mom" aria-pressed="${state.turnCause===c}" data-v="${esc(c)}"><span class="ml">${esc(c)}</span><span class="mb"><i style="width:${cc.get(c)/max*100}%"></i></span><b>${cc.get(c)}</b></button>`).join(""):'<p class="muted">아직 기록된 계기가 없습니다.</p>';
+  mel.querySelectorAll(".mom").forEach(b=>b.addEventListener("click",()=>{state.turnCause=state.turnCause===b.dataset.v?"전체":b.dataset.v;renderTurns();}));
+  document.getElementById("turnFilterNote").textContent=state.turnCause!=="전체"?`계기 '${state.turnCause}'로 걸러 보는 중 · 한 번 더 누르면 풀립니다`:"";
+
+  const key=t=>(t.d||"")+"|"+(t.ct||"");
+  const list=all.filter(t=>(state.turnKind==="전체"||t.kind===state.turnKind)&&(state.turnCause==="전체"||t.causes.includes(state.turnCause)))
+    .sort((a,b)=>state.turnSort==="old"?key(a).localeCompare(key(b)):key(b).localeCompare(key(a)));
+  const el=document.getElementById("timeline");
+  if(!list.length){el.innerHTML='<li class="empty">이 조건에 맞는 변곡점이 없습니다.</li>';return;}
+  el.innerHTML=list.map(t=>{
+    const cards=t.cards.map(conceptById).filter(Boolean);
+    const srcs=t.srcs.map(bookById).filter(Boolean);
+    return `<li class="tp" style="--k:${kindColor(t.kind)}">
+      <div class="side"><span class="when">${dot(t.d)}</span><span class="kind">${esc(t.kind||"미분류")}</span></div>
+      <div class="main">
+        <a class="tt" href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.title)}</a>
+        ${t.said?`<p class="quote">${esc(t.said)}</p>`:""}
+        ${t.moved?`<div class="moved">${movedHtml(t.moved)}</div>`:""}
+        <div class="meta2">${t.causes.map(c=>`<span class="tag">${esc(c)}</span>`).join("")}${srcs.map(b=>`<span>『${esc(b.title)}』</span>`).join("")}</div>
+        ${cards.length?`<div class="meta2">${cards.map(c=>`<a href="${esc(c.url)}" target="_blank" rel="noopener"><span class="sdot s-${stageKey(c.stage)}" aria-hidden="true"></span>${esc(c.title)}</a>`).join("")}</div>`:""}
+      </div>
+    </li>`;}).join("");
+}
+
+function stripLinks(){
+  document.querySelectorAll('a[href*="notion.com"],a[href*="notion.so"]').forEach(a=>{a.removeAttribute("href");a.removeAttribute("target");a.removeAttribute("rel");a.classList.add("nolink");});
+}
+function renderAll(){
+  if(!state.selected||!bookById(state.selected)){
+    const done=state.books.filter(b=>b.status==="완독").sort((a,b)=>readKey(b).localeCompare(readKey(a)));
+    state.selected=(done[0]||state.books[0]||{}).id||null;
+  }
+  renderMast();renderReading();renderShelf();renderDetail();renderGarden();renderTurns();renderRetro();stripLinks();
+}
+
+/* ---------- 노션 실시간 연동 ---------- */
+function setSync(kind,text,action){
+  const s=document.getElementById("sync");s.dataset.state=kind;
+  document.getElementById("syncText").textContent=text;
+  const a=document.getElementById("syncAct");a.innerHTML="";
+  if(action){const b=document.createElement("button");b.className="btn";b.textContent=action.label;b.addEventListener("click",action.run);a.appendChild(b);}
+}
+function rowsFrom(result){
+  let p=result&&result.payload;
+  if(typeof p==="string"){try{p=JSON.parse(p);}catch(e){p=null;}}
+  if(p&&Array.isArray(p.results))return p.results;
+  const t=result&&Array.isArray(result.content)&&result.content.find(c=>c.type==="text");
+  if(t){try{const j=JSON.parse(t.text);if(Array.isArray(j.results))return j.results;}catch(e){}}
+  return null;
+}
+function stamp(result){const t=result&&result.cache&&result.cache.storedAt;const d=t?new Date(t):new Date();return String(d.getMonth()+1).padStart(2,"0")+"."+String(d.getDate()).padStart(2,"0")+" "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
+
+let mcpRef=null;const live={books:false,concepts:false,turns:false};
+function applyResult(kind,result){
+  const rows=rowsFrom(result);
+  if(!rows){setSync("warn","노션 응답을 읽지 못해 저장본을 보여 주는 중",{label:"다시 불러오기",run:refreshNow});return;}
+  if(kind==="books")state.books=normBooks(rows);else if(kind==="turns")state.turns=normTurns(rows);else state.concepts=normConcepts(rows);
+  live[kind]=true;renderAll();
+  setSync("live",(live.books&&live.concepts&&live.turns?"노션과 연결됨":"노션에서 불러오는 중")+" · "+stamp(result)+" 기준",{label:"새로 고침",run:refreshNow});
+}
+function handleError(err){
+  const code=err&&err.code;
+  if(code==="approval_required"||code==="consent_required"){setSync("warn","노션을 읽으려면 허용이 필요합니다. 지금은 저장본입니다.",{label:"노션 허용하고 불러오기",run:refreshNow});return;}
+  if(code==="needs_reauth"){setSync("warn","노션 연결이 만료됐습니다. claude.ai 설정 → 커넥터에서 Notion을 다시 연결하세요.");return;}
+  if(code==="server_not_connected"||code==="selection_required"){setSync("warn","claude.ai 설정 → 커넥터에서 Notion을 연결하면 실시간으로 바뀝니다. 지금은 저장본입니다.");return;}
+  if(code==="not_in_manifest"||code==="blocked_by_policy"){setSync("warn","이 화면에 노션 읽기가 허용되지 않아 저장본을 보여 주는 중");return;}
+  setSync("warn","노션을 잠시 불러오지 못했습니다. 저장본을 보여 주는 중",{label:"다시 불러오기",run:refreshNow});
+}
+async function refreshNow(){
+  if(!mcpRef)return;
+  setSync("snap","노션에서 불러오는 중…");
+  try{
+    const opt={cache:{staleTime:0,gcTime:7*24*3600e3,refresh:true}};
+    const [b,c,t]=await Promise.all([mcpRef.callTool(NOTION,TOOL,BOOKS_Q,opt),mcpRef.callTool(NOTION,TOOL,CONCEPTS_Q,opt),mcpRef.callTool(NOTION,TOOL,TURNS_Q,opt)]);
+    applyResult("books",b);applyResult("concepts",c);applyResult("turns",t);
+  }catch(e){handleError(e);}
+}
+/* 공개본: 노션 실시간 연동 없음 */
+state.books=normBooks(SNAP_BOOKS);
+state.concepts=normConcepts(SNAP_CONCEPTS);
+state.turns=normTurns(SNAP_TURNS);
+document.getElementById("turnSort").addEventListener("change",e=>{state.turnSort=e.target.value;renderTurns();});
+document.getElementById("sort").addEventListener("change",e=>{state.sort=e.target.value;renderShelf();});
+renderAll();
+</script>
+</body>
+</html>
