@@ -53,6 +53,12 @@ h1 small{display:block;font-family:var(--f-body);font-weight:300;font-size:16px;
 .go a{font-family:var(--f-label);font-size:12px;letter-spacing:.05em;text-decoration:none;border-bottom:1px solid var(--ink-soft);padding-bottom:1px}
 .go a.primary{color:var(--paper);background:var(--ink);border:none;padding:6px 14px;border-radius:2px}
 .go a:hover{opacity:.8}
+.samples{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-width:620px;margin:0 0 16px}
+.samples .label{grid-column:1/-1}
+.samples a{display:flex;flex-direction:column;gap:2px;text-decoration:none;border:1px solid var(--rule);background:var(--paper);padding:10px 12px;font-size:13px;line-height:1.5}
+.samples a b{font-family:var(--f-label);font-weight:500;font-size:11px;letter-spacing:.08em;color:var(--ink-soft)}
+.samples a:hover{border-color:var(--ink-soft)}
+.go{align-items:center}
 .feature{background:var(--paper-2);border:1px solid var(--rule);padding:26px 26px 22px;margin-bottom:6px}
 .feature.work{border-bottom:1px solid var(--rule)}
 
@@ -142,7 +148,7 @@ footer{border-top:1px solid var(--rule);padding-top:18px;display:flex;justify-co
     <article class="work">
       <div class="meta"><span class="no">02</span><span class="kind">데이터 · 자동화</span></div>
       <div>
-        <h3><a href="https://github.com/Kimey102/KBO_Doosan-Bears">두산 베어스 시즌 대시보드</a></h3>
+        <h3><a href="/KBO_Doosan-Bears/">두산 베어스 시즌 대시보드</a></h3>
         <p>GitHub Actions가 매일 아침 KBO 순위, 득실, 최근 10경기, 상대 전적, 일정을 모아 대시보드를 다시 만듭니다. 가을야구 진출 확률은 피타고리안 승률과 실제 성적을 섞은 전력값으로 남은 경기를 10만 번 모의 시행해 계산합니다. 수집에 실패한 항목은 비워 두고 값을 지어내지 않도록 설계했습니다.</p>
         <ul class="facts">
           <li><b>매일 08:30</b>자동 갱신</li>
@@ -150,7 +156,12 @@ footer{border-top:1px solid var(--rule);padding-top:18px;display:flex;justify-co
           <li><b>35편</b>경기 전·후 분석 리포트</li>
         </ul>
         <div class="tags"><span>Python</span><span>Playwright</span><span>GitHub Actions</span><span>GitHub Pages</span></div>
-        <div class="go"><a href="https://github.com/Kimey102/KBO_Doosan-Bears">저장소 보기 ↗</a></div>
+        <div class="samples">
+          <span class="label">분석 리포트 샘플 · 8.14 광주 KIA전</span>
+          <a href="/KBO_Doosan-Bears/reports/2026-08-14_KIA_pre.html"><b>경기 전</b>라인업을 반영한 승률 예측</a>
+          <a href="/KBO_Doosan-Bears/reports/2026-08-14_KIA_post.html"><b>경기 후</b>두산 10 : 4 KIA 결과 분석</a>
+        </div>
+        <div class="go"><a class="primary" href="/KBO_Doosan-Bears/">대시보드 보기 →</a><a href="https://github.com/Kimey102/KBO_Doosan-Bears">저장소 보기 ↗</a></div>
       </div>
     </article>
 
