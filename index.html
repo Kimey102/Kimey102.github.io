@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>밍지 · 작업 모음</title>
+<meta name="description" content="읽고 생각한 것을 기록하고, 일상에 필요한 도구를 직접 만드는 밍지의 작업 모음">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f5f3ed;--paper-2:#ecE9e0;--ink:#2a2c2f;--ink-soft:#6c6f74;--rule:#d6d2c6;--accent:#465a72;
+  --f-display:"Gowun Batang","Noto Serif KR",serif;--f-body:"Noto Sans KR",system-ui,sans-serif;--f-label:"DM Mono",ui-monospace,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:980px;margin:0 auto;padding:56px 24px 72px;display:flex;flex-direction:column;gap:56px}
+.label{font-family:var(--f-label);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+
+header{display:flex;flex-direction:column;gap:18px;border-bottom:3px double var(--rule);padding-bottom:32px}
+h1{font-family:var(--f-display);font-weight:700;font-size:40px;line-height:1.2;margin:0}
+h1 small{display:block;font-family:var(--f-body);font-weight:300;font-size:16px;color:var(--ink-soft);margin-top:8px}
+.intro{font-family:var(--f-display);font-size:19px;line-height:1.75;margin:0;max-width:640px;text-wrap:pretty}
+.links{display:flex;gap:18px;flex-wrap:wrap}
+.links a{font-family:var(--f-label);font-size:12px;letter-spacing:.06em;text-decoration:none;border-bottom:1px solid var(--ink-soft);padding-bottom:1px}
+.links a:hover{color:var(--accent);border-color:var(--accent)}
+
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px solid var(--rule);padding-bottom:8px;margin-bottom:22px}
+.sec-head h2{margin:0;display:flex;align-items:baseline;gap:12px;font-weight:400}
+.sec-head h2 .ko{font-family:var(--f-display);font-size:21px}
+
+.work{display:grid;grid-template-columns:200px minmax(0,1fr);gap:8px 32px;padding:26px 0;border-bottom:1px solid var(--rule)}
+.work:first-of-type{padding-top:4px}
+.work .meta{display:flex;flex-direction:column;gap:8px}
+.work .no{font-family:var(--f-label);font-size:11px;letter-spacing:.14em;color:var(--ink-soft)}
+.work .kind{display:inline-block;width:max-content;font-size:11.5px;border:1px solid var(--rule);border-radius:999px;padding:0 9px;color:var(--ink-soft)}
+.work h3{margin:0 0 8px;font-family:var(--f-display);font-size:23px;line-height:1.35}
+.work h3 a{text-decoration:none}
+.work h3 a:hover{text-decoration:underline}
+.work p{margin:0 0 12px;max-width:620px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 14px}
+.tags span{font-family:var(--f-label);font-size:11px;border:1px solid var(--rule);background:var(--paper);padding:1px 7px;border-radius:2px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;max-width:620px;margin:0 0 16px;padding:0;list-style:none}
+.facts li{border-left:2px solid var(--rule);padding:2px 0 2px 10px;font-size:12.5px;color:var(--ink-soft);line-height:1.5}
+.facts b{display:block;font-family:var(--f-label);font-weight:500;font-size:20px;color:var(--ink)}
+.go{display:flex;gap:16px;flex-wrap:wrap}
+.go a{font-family:var(--f-label);font-size:12px;letter-spacing:.05em;text-decoration:none;border-bottom:1px solid var(--ink-soft);padding-bottom:1px}
+.go a.primary{color:var(--paper);background:var(--ink);border:none;padding:6px 14px;border-radius:2px}
+.go a:hover{opacity:.8}
+.feature{background:var(--paper-2);border:1px solid var(--rule);padding:26px 26px 22px;margin-bottom:6px}
+.feature.work{border-bottom:1px solid var(--rule)}
+
+footer{border-top:1px solid var(--rule);padding-top:18px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-soft)}
+@media (max-width:760px){
+  .wrap{padding:36px 18px 56px;gap:44px}
+  h1{font-size:32px}
+  .work{grid-template-columns:1fr}
+  .work .meta{flex-direction:row;align-items:center;gap:12px}
+  .feature{padding:20px 18px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="label">Mingji · Works</span>
+    <h1>밍지<small>읽고, 생각하고, 필요한 도구는 직접 만듭니다</small></h1>
+    <p class="intro">책과 영화와 유물에서 건진 생각을 기록하고 키우는 일, 그리고 일상에서 반복되는 일을 자동으로 처리하는 작은 도구를 만드는 일을 이곳에 모아 둡니다.</p>
+    <nav class="links" aria-label="바깥 링크">
+      <a href="https://github.com/Kimey102">GitHub ↗</a>
+    </nav>
+  </header>
+
+  <section aria-labelledby="h-works">
+    <div class="sec-head">
+      <h2 id="h-works"><span class="label">Works</span><span class="ko">작업</span></h2>
+      <span class="label">3 projects</span>
+    </div>
+
+    <article class="work feature">
+      <div class="meta"><span class="no">01</span><span class="kind">독서 · 사유 아카이브</span></div>
+      <div>
+        <h3><a href="library/">밍지의 알렉산드리아 도서관</a></h3>
+        <p>책, 영화, 유물, 유튜브, 강연에서 떠오른 생각을 한 문장짜리 개념 카드로 남기고, 그 생각이 언제 무엇 때문에 움직였는지까지 기록하는 아카이브입니다. 노션 데이터베이스 세 곳(서가, 개념 연결망, 사유의 변곡점)을 관계로 엮고, 이 로비 페이지에서 한 장으로 펼쳐 봅니다.</p>
+        <ul class="facts">
+          <li><b>102</b>서가에 꽂은 책·매체</li>
+          <li><b>57</b>개념 카드</li>
+          <li><b>8</b>기록된 사유의 변곡점</li>
+        </ul>
+        <div class="tags"><span>Notion</span><span>Claude</span><span>HTML/JS</span><span>지식 관리</span></div>
+        <div class="go"><a class="primary" href="library/">도서관 들어가기 →</a></div>
+      </div>
+    </article>
+
+    <article class="work">
+      <div class="meta"><span class="no">02</span><span class="kind">데이터 · 자동화</span></div>
+      <div>
+        <h3><a href="https://github.com/Kimey102/KBO_Doosan-Bears">두산 베어스 시즌 대시보드</a></h3>
+        <p>GitHub Actions가 매일 아침 KBO 순위, 득실, 최근 10경기, 상대 전적, 일정을 모아 대시보드를 다시 만듭니다. 가을야구 진출 확률은 피타고리안 승률과 실제 성적을 섞은 전력값으로 남은 경기를 10만 번 모의 시행해 계산합니다. 수집에 실패한 항목은 비워 두고 값을 지어내지 않도록 설계했습니다.</p>
+        <ul class="facts">
+          <li><b>매일 08:30</b>자동 갱신</li>
+          <li><b>100,000회</b>몬테카를로 시뮬레이션</li>
+          <li><b>35편</b>경기 전·후 분석 리포트</li>
+        </ul>
+        <div class="tags"><span>Python</span><span>Playwright</span><span>GitHub Actions</span><span>GitHub Pages</span></div>
+        <div class="go"><a href="https://github.com/Kimey102/KBO_Doosan-Bears">저장소 보기 ↗</a></div>
+      </div>
+    </article>
+
+    <article class="work">
+      <div class="meta"><span class="no">03</span><span class="kind">생활 자동화</span></div>
+      <div>
+        <h3><a href="https://github.com/Kimey102/Aengbong_Camp_alert">캠핑장 빈자리 알림</a></h3>
+        <p>엑스티켓 캠핑장(기본값 앵봉산 가족캠핑장)의 예약 현황을 1분 간격으로 조회하고, 감시 중인 날짜에 새 빈자리가 생기면 텔레그램으로 알려 줍니다. 직전 결과와 비교해 새로 열린 자리만 알리고, GitHub의 예약 실행 지연을 피하려고 한 번 시작된 실행이 몇 시간 동안 이어서 감시하도록 만들었습니다.</p>
+        <div class="tags"><span>Python</span><span>GitHub Actions</span><span>Telegram Bot</span></div>
+        <div class="go"><a href="https://github.com/Kimey102/Aengbong_Camp_alert">저장소 보기 ↗</a></div>
+      </div>
+    </article>
+  </section>
+
+  <footer>
+    <span>© 2026 밍지</span>
+    <span>마지막 갱신 2026.11.19</span>
+  </footer>
+</div>
+</body>
+</html>
