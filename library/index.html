@@ -228,6 +228,30 @@ select{font:inherit;font-size:12px;background:var(--paper);border:1px solid var(
   h1{font-size:23px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* 생각 하나가 자란 길 */
+.path-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px 40px;margin-bottom:22px}
+.path-head .pt{font-family:var(--f-display);font-size:22px;font-weight:700;line-height:1.4;margin:4px 0 0;text-wrap:balance}
+.path-head .pn{font-size:13.5px;line-height:1.75;color:var(--ink-soft);margin:0}
+.path-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:0;position:relative}
+.path-steps::before{content:"";position:absolute;left:0;right:0;top:15px;height:2px;background:var(--accent);opacity:.3}
+.ps{position:relative;padding:34px 16px 0 0;display:flex;flex-direction:column;gap:7px}
+.ps::before{content:"";position:absolute;left:0;top:8px;width:16px;height:16px;border-radius:50%;background:var(--paper);border:3px solid var(--k);box-sizing:border-box}
+.ps .pd{font-family:var(--f-label);font-size:13px;font-weight:500}
+.ps .pk{font-size:11px;border:1px solid var(--k);color:var(--k);border-radius:999px;padding:0 8px;width:max-content}
+.ps .ptt{font-size:13.5px;font-weight:500;line-height:1.5}
+.ps .pq{font-family:var(--f-display);font-size:13.5px;line-height:1.65;margin:0;border-left:2px solid var(--k);padding-left:9px;color:var(--ink);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.path-now{margin-top:22px;border:1px solid var(--rule);background:var(--paper-2);padding:14px 18px;display:grid;grid-template-columns:110px minmax(0,1fr);gap:4px 16px;font-size:13.5px;line-height:1.7}
+.path-now .label{padding-top:3px}
+.path-now q{font-family:var(--f-display);font-size:15px;quotes:none}
+@media (max-width:900px){
+  .path-head{grid-template-columns:1fr}
+  .path-steps{grid-template-columns:1fr;padding-left:24px}
+  .path-steps::before{left:7px;right:auto;top:8px;bottom:8px;width:2px;height:auto}
+  .ps{padding:0 0 22px}
+  .ps::before{left:-24px;top:2px}
+  .path-now{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -275,6 +299,14 @@ select{font:inherit;font-size:12px;background:var(--paper);border:1px solid var(
         <dd>카드의 단계를 옮기는 것은 언제나 밍지의 판단입니다. 변곡점 기록은 그 판단의 근거로만 참고합니다.</dd>
       </dl>
     </div>
+  </section>
+
+  <section aria-labelledby="h-path">
+    <div class="sec-head">
+      <h2 id="h-path"><span class="label">Example</span><span class="ko">생각 하나가 자란 길</span></h2>
+      <a class="label" href="#h-turn" style="text-decoration:none">변곡점 전체 보기 ↓</a>
+    </div>
+    <div class="path" id="path"></div>
   </section>
 
   <section aria-labelledby="h-reading">
@@ -558,6 +590,24 @@ function renderGarden(){
   }).join("");
 }
 
+
+/* ---------- 생각 하나가 자란 길 ---------- */
+const PATH_CARD = "3cfe61bbcd9881b88e07f51f4f7ef321";
+function renderPath(){
+  const el=document.getElementById("path"); if(!el)return;
+  const c=conceptById(PATH_CARD);
+  const steps=state.turns.filter(t=>t.cards.includes(PATH_CARD)).sort((a,b)=>((a.d||"")+(a.ct||"")).localeCompare((b.d||"")+(b.ct||"")));
+  if(!c||steps.length<2){el.closest("section").style.display="none";return;}
+  const first=steps[0].d,last=steps[steps.length-1].d;
+  const days=Math.round((new Date(last)-new Date(first))/864e5);
+  el.innerHTML=`<div class="path-head">
+      <div><span class="label">개념 카드 · ${esc(c.stage)}</span><p class="pt">${esc(c.title)}</p></div>
+      <p class="pn">카드 하나가 처음 심긴 날부터 지금까지 어떻게 움직였는지, 변곡점 기록만 이어 붙였습니다. ${dot(first)}부터 ${dot(last)}까지 ${days}일 동안 ${steps.length}번 움직였고, 따옴표 안은 그때 실제로 한 말입니다.</p>
+    </div>
+    <ol class="path-steps" style="--n:${steps.length}">${steps.map(t=>`<li class="ps" style="--k:${kindColor(t.kind)}">
+      <span class="pd">${dot(t.d).slice(5)}</span><span class="pk">${esc(t.kind)}</span>
+      <span class="ptt">${esc(t.title)}</span>${t.said?`<p class="pq">“${esc(t.said)}”</p>`:""}</li>`).join("")}</ol>`;
+}
 /* ---------- 사유의 단면 (기간별 회고) ---------- */
 const PERIODS=[["month","이번 달"],["quarter","이번 분기"],["year","올해"],["all","전체"]];
 function periodRange(p){
@@ -660,7 +710,7 @@ function renderAll(){
     const done=state.books.filter(b=>b.status==="완독").sort((a,b)=>readKey(b).localeCompare(readKey(a)));
     state.selected=(done[0]||state.books[0]||{}).id||null;
   }
-  renderMast();renderReading();renderShelf();renderDetail();renderGarden();renderTurns();renderRetro();stripLinks();
+  renderMast();renderReading();renderShelf();renderDetail();renderGarden();renderTurns();renderRetro();renderPath();stripLinks();
 }
 
 /* ---------- 노션 실시간 연동 ---------- */
