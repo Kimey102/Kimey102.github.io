@@ -284,13 +284,13 @@ select{font:inherit;font-size:12px;background:var(--paper);border:1px solid var(
       </div>
       <div class="side">
         <p>이 페이지는 노션에 쌓아 온 독서·사유 기록을 한 장으로 펼쳐 본 로비입니다. 무엇을 읽었는지보다, 읽은 것에서 어떤 생각이 나왔고 그 생각이 시간이 지나며 어떻게 자랐는지를 따라가도록 짰습니다.</p>
-        <p>기록은 노션 데이터베이스 세 곳에 나뉘어 있고, 서로 관계로 이어져 있습니다. 이 공개본은 매일 한 번 노션에서 기록을 새로 옮겨 오며, 지금 보이는 내용은 {{KO_DATE}} 기준입니다.</p>
+        <p>기록은 노션 데이터베이스 세 곳에 나뉘어 있고, 서로 관계로 이어져 있습니다. 이 공개본은 매일 한 번 노션에서 기록을 새로 옮겨 오며, 지금 보이는 내용은 {{KO_DATE}} 기준입니다. 서가는 전부 싣고, 개념 카드와 변곡점은 일부만 골라 싣습니다.</p>
       </div>
       <div class="parts">
         <div class="part"><h3>한 서가, 여러 매체</h3><p>책뿐 아니라 영화·유물·유튜브·강연을 같은 서가에 꽂고 '매체'로만 구분합니다. 여행에서 얻은 생각도 '여행'이 아니라 직접 본 유물로 기록해, 사유의 출처를 행위가 아니라 대상으로 잡습니다.</p><a class="jump" href="#h-shelf">서가 보기 ↓</a></div>
         <div class="part"><h3>책이 아닌 개념 단위</h3><p>읽은 것에서 한 문장으로 설 수 있는 명제만 골라 개념 카드로 만듭니다. 카드는 다른 책·매체와 이어지며 씨앗, 자라는 중, 정리됨 세 단계로 자랍니다.</p><a class="jump" href="#h-garden">개념 정원 보기 ↓</a></div>
         <div class="part"><h3>생각이 움직인 순간</h3><p>카드가 무엇을 말하는지와 별도로, 생각이 언제·무엇 때문에·어떻게 움직였는지를 한 줄씩 남깁니다. 변화는 심음, 다시 말하기, 확장, 교차, 전환 다섯 가지로 나눕니다.</p><a class="jump" href="#h-turn">변곡점 보기 ↓</a></div>
-        <div class="part"><h3>기간으로 접어 보기</h3><p>한 달, 한 분기, 한 해 단위로 무엇을 읽고, 어떤 생각을 심고, 어떤 생각이 움직였는지를 한 장의 보고서처럼 모아 봅니다.</p><a class="jump" href="#h-retro">사유의 단면 보기 ↓</a></div>
+        <div class="part"><h3>생각 하나가 자란 길</h3><p>카드 하나를 골라, 처음 심긴 날부터 지금까지 생각이 어떤 순서로 움직였는지 따라가 봅니다.</p><a class="jump" href="#h-path">예시 보기 ↓</a></div>
       </div>
       <dl class="rules">
         <dt>Claude와 일하는 법</dt>
@@ -317,13 +317,6 @@ select{font:inherit;font-size:12px;background:var(--paper);border:1px solid var(
     <div class="reading" id="reading"></div>
   </section>
 
-  <section aria-labelledby="h-retro">
-    <div class="sec-head">
-      <h2 id="h-retro"><span class="label">Retrospect</span><span class="ko">사유의 단면</span></h2>
-      <div class="chips" id="periodChips" role="group" aria-label="기간 고르기"></div>
-    </div>
-    <div class="retro" id="retro"></div>
-  </section>
 
   <section aria-labelledby="h-turn">
     <div class="sec-head">
@@ -340,6 +333,7 @@ select{font:inherit;font-size:12px;background:var(--paper);border:1px solid var(
       <div class="momentum" id="momentum"></div>
       <div class="chips" id="kindChips" role="group" aria-label="변화의 종류로 걸러 보기"></div>
       <span class="muted" id="turnFilterNote"></span>
+      <span class="muted" id="turnSampleNote"></span>
     </div>
     <ol class="tl" id="timeline"></ol>
   </section>
@@ -399,6 +393,7 @@ const SNAP_CONCEPTS = /*__CONCEPTS__*/[];
 
 const SNAP_TURNS = /*__TURNS__*/[];
 
+const TOTALS = /*__TOTALS__*/{};
 const SNAP_NOW = /*__NOW__*/"2026-11-19T12:00:00+09:00";
 const NOTION = "Notion";
 const TOOL = "notion-query-data-sources";
@@ -460,7 +455,7 @@ function renderMast(){
   document.getElementById("today").textContent=d.getFullYear()+"."+String(d.getMonth()+1).padStart(2,"0")+"."+String(d.getDate()).padStart(2,"0")+" "+days[d.getDay()];
   const fin=state.books.filter(b=>b.status==="완독").length;
   const rd=state.books.filter(b=>b.status==="읽는 중").length;
-  document.getElementById("stats").innerHTML=[["Entries",state.books.length],["Finished",fin],["Reading",rd],["Cards",state.concepts.length],["Turns",state.turns.length]]
+  document.getElementById("stats").innerHTML=[["Entries",state.books.length],["Finished",fin],["Reading",rd],["Cards",TOTALS.concepts||state.concepts.length],["Turns",TOTALS.turns||state.turns.length]]
     .map(([k,v])=>`<span class="stat"><span class="label">${k}</span><b>${v}</b></span>`).join("");
 }
 
@@ -557,7 +552,7 @@ function renderDetail(){
 function stageKey(s){const f=STAGES.find(x=>x[0]===s);return f?f[1]:"seed";}
 function renderGarden(){
   const all=state.concepts;
-  document.getElementById("gardenCount").textContent=all.length+" cards";
+  document.getElementById("gardenCount").textContent=(TOTALS.concepts&&TOTALS.concepts>all.length)?`${TOTALS.concepts}장 중 ${all.length}장 공개`:all.length+" cards";
   const tc=counts(all.flatMap(c=>c.themes.map(t=>({t}))),x=>x.t);
   const themes=[["전체",all.length],...[...tc.entries()].sort((a,b)=>b[1]-a[1])];
   const el=document.getElementById("themeChips");
@@ -592,7 +587,7 @@ function renderGarden(){
 
 
 /* ---------- 생각 하나가 자란 길 ---------- */
-const PATH_CARD = "3cfe61bbcd9881b88e07f51f4f7ef321";
+const PATH_CARD = /*__PATH__*/"";
 function renderPath(){
   const el=document.getElementById("path"); if(!el)return;
   const c=conceptById(PATH_CARD);
@@ -668,7 +663,9 @@ function renderRetro(){
 
 /* ---------- 사유의 변곡점 ---------- */
 function renderTurns(){
-  const all=state.turns;
+  const all=state.turns.filter(t=>!t.cards.includes(PATH_CARD));
+  const sn=document.getElementById("turnSampleNote");
+  if(sn)sn.textContent=`전체 ${TOTALS.turns||state.turns.length}개 중 위 예시에 나온 것을 뺀 ${all.length}개를 골라 싣습니다.`;
   const kc=counts(all,t=>t.kind);
   const kel=document.getElementById("kindChips");
   kel.innerHTML='<span class="label">종류</span>'+[["전체",all.length,""],...KINDS.filter(([k])=>kc.has(k)).map(([k,col])=>[k,kc.get(k),col])].map(([v,n,col])=>`<button class="chip" aria-pressed="${v===state.turnKind}" data-v="${esc(v)}">${col?`<span class="sdot" style="background:${col}" aria-hidden="true"></span>`:""}${esc(v)}<span class="n">${n}</span></button>`).join("");
@@ -710,7 +707,7 @@ function renderAll(){
     const done=state.books.filter(b=>b.status==="완독").sort((a,b)=>readKey(b).localeCompare(readKey(a)));
     state.selected=(done[0]||state.books[0]||{}).id||null;
   }
-  renderMast();renderReading();renderShelf();renderDetail();renderGarden();renderTurns();renderRetro();renderPath();stripLinks();
+  renderMast();renderReading();renderShelf();renderDetail();renderGarden();renderTurns();renderPath();stripLinks();
 }
 
 /* ---------- 노션 실시간 연동 ---------- */

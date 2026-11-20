@@ -5,6 +5,10 @@ library/template.html 에 넣고 library/index.html 을 다시 만든다.
 필요한 환경변수: NOTION_TOKEN (노션 통합의 Internal Integration Secret)
 수집이 하나라도 실패하면 아무 파일도 바꾸지 않고 오류로 끝낸다
 (오래되거나 반쯤 빈 페이지를 밀어 올리지 않기 위해서).
+
+공개 범위는 library/public.json 이 정한다. 서가는 전체를 싣고,
+개념 카드와 변곡점은 그 목록에 있는 것만 싣는다(새로 생긴 것은 기본으로 비공개).
+'replace' 의 문구는 공개 전에 바꿔 쓴다. 첫 화면과 도서관 머리의 숫자는 전체 개수를 쓴다.
 """
 import datetime as dt
 import json
@@ -155,22 +159,54 @@ def turn_rows(pages):
     return out
 
 
+# ---------- 공개 범위 ----------
+def load_public():
+    return json.loads((ROOT / "library" / "public.json").read_text(encoding="utf-8"))
+
+
+def pid_of(url):
+    m = re.search(r"[0-9a-f]{32}", url or "")
+    return m.group(0) if m else ""
+
+
+def scrub(value, rules):
+    if isinstance(value, str):
+        for r in rules:
+            value = value.replace(r["find"], r["to"])
+        return value
+    if isinstance(value, list):
+        return [scrub(v, rules) for v in value]
+    if isinstance(value, dict):
+        return {k: scrub(v, rules) for k, v in value.items()}
+    return value
+
+
+def to_public(books, concepts, turns, pub):
+    keep_c, keep_t = set(pub.get("concepts", [])), set(pub.get("turns", []))
+    concepts = [c for c in concepts if pid_of(c["url"]) in keep_c]
+    turns = [t for t in turns if pid_of(t["url"]) in keep_t]
+    rules = pub.get("replace", [])
+    return scrub(books, rules), scrub(concepts, rules), scrub(turns, rules)
+
+
 # ---------- 파일 쓰기 ----------
 def js_array(rows):
     # </script> 같은 문자열이 데이터에 섞여도 스크립트가 끊기지 않도록
     return json.dumps(rows, ensure_ascii=False).replace("</", "<\\/")
 
 
-def render(books, concepts, turns, now):
+def render(books, concepts, turns, now, totals, path_card):
     tpl = (ROOT / "library" / "template.html").read_text(encoding="utf-8")
     html = (tpl
             .replace("/*__BOOKS__*/[]", js_array(books))
             .replace("/*__CONCEPTS__*/[]", js_array(concepts))
             .replace("/*__TURNS__*/[]", js_array(turns))
             .replace('/*__NOW__*/"2026-11-19T12:00:00+09:00"', json.dumps(now.isoformat(timespec="seconds")))
+            .replace("/*__TOTALS__*/{}", json.dumps(totals))
+            .replace('/*__PATH__*/""', json.dumps(path_card))
             .replace("{{DOT_DATE}}", now.strftime("%Y.%m.%d"))
             .replace("{{KO_DATE}}", f"{now.year}년 {now.month}월 {now.day}일"))
-    if "/*__BOOKS__*/" in html or "{{DOT_DATE}}" in html:
+    if "/*__BOOKS__*/" in html or "{{DOT_DATE}}" in html or "/*__TOTALS__*/" in html or "/*__PATH__*/" in html:
         raise RuntimeError("템플릿 자리표시자가 남았습니다.")
     return html
 
@@ -196,10 +232,13 @@ def main(post=None, now=None):
     turns = turn_rows(query_all(token, TURNS_DS, post))
     if not books:
         raise RuntimeError("서가가 비어 있습니다. 통합에 데이터베이스가 공유됐는지 확인하세요.")
-    html = render(books, concepts, turns, now)
+    totals = {"books": len(books), "concepts": len(concepts), "turns": len(turns)}
+    pub = load_public()
+    p_books, p_concepts, p_turns = to_public(books, concepts, turns, pub)
+    html = render(p_books, p_concepts, p_turns, now, totals, pub.get("path_card", ""))
     (ROOT / "library" / "index.html").write_text(html, encoding="utf-8")
-    update_hub({"books": len(books), "concepts": len(concepts), "turns": len(turns)}, now)
-    print(f"서가 {len(books)} · 카드 {len(concepts)} · 변곡점 {len(turns)} · {now:%Y-%m-%d %H:%M} KST")
+    update_hub(totals, now)
+    print(f"서가 {len(books)} · 카드 {len(concepts)}(공개 {len(p_concepts)}) · 변곡점 {len(turns)}(공개 {len(p_turns)}) · {now:%Y-%m-%d %H:%M} KST")
 
 
 if __name__ == "__main__":

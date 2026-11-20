@@ -1,0 +1,28 @@
+{
+  "_설명": "공개 사이트에 싣는 개념 카드와 변곡점 목록, 그리고 공개 전에 바꿔 쓸 문구. 여기 없는 카드·변곡점은 노션에 새로 생겨도 공개되지 않는다. 서가는 전체를 싣는다.",
+  "concepts": [
+    "3cfe61bbcd9881b88e07f51f4f7ef321",
+    "3cfe61bbcd98819a8311cf21622a73ac",
+    "3cee61bbcd9881f78e5bf95005be5de4",
+    "3c7e61bbcd9881739187d33271252e15",
+    "41ae61bbcd98815cba06d3cea51173a4",
+    "3cee61bbcd98815c8954d8858eb926dc",
+    "3d4e61bbcd9881e1b4c3fb1442b72827",
+    "3dce61bbcd9881d78e47d17b173711ff",
+    "41ce61bbcd9881779e09d3f517eea270"
+  ],
+  "turns": [
+    "41ce61bbcd98817f9a50fb515c71e2c5",
+    "41ce61bbcd988116886ef3fdf52f134e",
+    "41ce61bbcd988163b939f2db468d61f7",
+    "41ce61bbcd9881bab8f8ddf06b34035f",
+    "41de61bbcd988125a5ecc5af35f0df25",
+    "41ce61bbcd98812ab37cd1bab837c905",
+    "41ce61bbcd9881f18664fb01a6184bf2",
+    "41de61bbcd988103b68fc3366a394d22"
+  ],
+  "path_card": "3cfe61bbcd9881b88e07f51f4f7ef321",
+  "replace": [
+    {"find": "교수님이 감사원 국장일때의 경험", "to": "교수님의 경험"}
+  ]
+}
