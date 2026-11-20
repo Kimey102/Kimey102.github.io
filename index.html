@@ -1,224 +1,220 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>밍지 · 작업 모음</title>
-<meta name="description" content="읽고 생각한 것을 기록하고, 일상에 필요한 도구를 직접 만들고, 연구용역 실무에서 Claude와 함께 일하는 밍지의 작업 모음">
+<meta name="description" content="읽고, 생각하고, 필요한 도구는 직접 만듭니다. 밍지의 작업 모음.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#f5f3ed;--paper-2:#ecE9e0;--ink:#2a2c2f;--ink-soft:#6c6f74;--rule:#d6d2c6;--accent:#465a72;
-  --f-display:"Gowun Batang","Noto Serif KR",serif;--f-body:"Noto Sans KR",system-ui,sans-serif;--f-label:"DM Mono",ui-monospace,monospace;
-  color-scheme:light;
+  --paper:#F5F3ED; --ink:#2A2C2F; --soft:#6C6F74; --rule:#D6D2C6; --hover:#ECE9E0;
+  --f-display:'Gowun Batang',serif; --f-body:'Noto Sans KR',system-ui,sans-serif; --f-mono:'DM Mono',monospace;
 }
 *{box-sizing:border-box}
-html,body{margin:0}
-html,body{overflow-x:hidden}
-body{background:var(--paper);overflow-wrap:break-word;word-break:keep-all;color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
+html,body{margin:0;overflow-x:hidden}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);-webkit-font-smoothing:antialiased}
+h1,h2,h3,p,span,a,li,figcaption{word-break:keep-all;overflow-wrap:break-word}
 a{color:inherit}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.wrap{max-width:980px;margin:0 auto;padding:56px 24px 72px;display:flex;flex-direction:column;gap:56px}
-.label{font-family:var(--f-label);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+.bal{text-wrap:balance}
+.pre{text-wrap:pretty}
+.mono{font-family:var(--f-mono)}
 
-header{display:flex;flex-direction:column;gap:18px;border-bottom:3px double var(--rule);padding-bottom:32px}
-h1{font-family:var(--f-display);font-weight:700;font-size:40px;line-height:1.2;margin:0}
-h1 small{display:block;font-family:var(--f-body);font-weight:300;font-size:16px;color:var(--ink-soft);margin-top:8px}
-.intro{font-family:var(--f-display);font-size:19px;line-height:1.75;margin:0;max-width:640px;text-wrap:pretty}
-.links{display:flex;gap:18px;flex-wrap:wrap}
-.links a{font-family:var(--f-label);font-size:12px;letter-spacing:.06em;text-decoration:none;border-bottom:1px solid var(--ink-soft);padding-bottom:1px}
-.links a:hover{color:var(--accent);border-color:var(--accent)}
+.page{max-width:1240px;margin:0 auto;padding:clamp(28px,4vw,44px) clamp(18px,3vw,28px) 48px;display:grid;grid-template-columns:minmax(300px,400px) minmax(0,1fr);gap:clamp(28px,4vw,52px);align-items:start}
 
-.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px solid var(--rule);padding-bottom:8px;margin-bottom:22px}
-.sec-head h2{margin:0;display:flex;align-items:baseline;gap:12px;font-weight:400}
-.sec-head h2 .ko{font-family:var(--f-display);font-size:21px}
+/* 왼쪽 */
+.side{position:sticky;top:32px;display:flex;flex-direction:column;gap:34px;min-height:calc(100vh - 80px)}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;color:var(--soft)}
+.side header{display:flex;flex-direction:column;gap:12px}
+.side h1{margin:0;font-family:var(--f-display);font-size:clamp(44px,5vw,60px);font-weight:700;line-height:1.05}
+.side header p{margin:0;font-size:16px;line-height:1.7;color:#4A4C50}
+.list{display:flex;flex-direction:column;border-top:1px solid var(--rule);margin:0;padding:0;list-style:none}
+.list button{all:unset;box-sizing:border-box;width:100%;cursor:pointer;display:grid;grid-template-columns:36px minmax(0,1fr) 20px;gap:4px 12px;align-items:baseline;padding:18px 10px;border-bottom:1px solid var(--rule);transition:background .2s ease}
+.list button:hover,.list button[aria-selected="true"]{background:var(--hover)}
+.list button:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+.list .no{font-family:var(--f-mono);font-size:12px;color:#9A9DA2}
+.list .t{display:flex;flex-direction:column;gap:4px}
+.list .t b{font-family:var(--f-display);font-size:clamp(18px,1.6vw,21px);line-height:1.4;text-wrap:balance}
+.list .t span{font-size:13px;color:var(--soft)}
+.list .arr{font-size:16px;color:#9A9DA2;transition:transform .2s ease}
+.list button[aria-selected="true"] .no,.list button[aria-selected="true"] .arr{color:#7A5A57}
+.list button[aria-selected="true"] .arr{transform:translateX(3px)}
+.side footer{margin-top:auto;display:flex;gap:18px;font-family:var(--f-mono);font-size:12px;color:var(--soft)}
+.side footer a{text-decoration:none}
+.side footer a:hover{text-decoration:underline}
 
-.work{display:grid;grid-template-columns:200px minmax(0,1fr);gap:8px 32px;padding:26px 0;border-bottom:1px solid var(--rule)}
-.work:first-of-type{padding-top:4px}
-.work .meta{display:flex;flex-direction:column;gap:8px}
-.work .no{font-family:var(--f-label);font-size:11px;letter-spacing:.14em;color:var(--ink-soft)}
-.work .kind{display:inline-block;width:max-content;font-size:11.5px;border:1px solid var(--rule);border-radius:999px;padding:0 9px;color:var(--ink-soft)}
-.work h3{margin:0 0 8px;font-family:var(--f-display);font-size:23px;line-height:1.35}
-.work h3 a{text-decoration:none}
-.work h3 a:hover{text-decoration:underline}
-.work p{margin:0 0 12px;max-width:620px}
-.tags{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 14px}
-.tags span{font-family:var(--f-label);font-size:11px;border:1px solid var(--rule);background:var(--paper);padding:1px 7px;border-radius:2px}
-.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-width:620px;margin:0 0 16px;padding:0;list-style:none}
-.facts li{border-left:2px solid var(--rule);padding:2px 0 2px 10px;font-size:12.5px;color:var(--ink-soft);line-height:1.5}
-.facts b{display:block;font-family:var(--f-label);font-weight:500;font-size:20px;color:var(--ink)}
-.go{display:flex;gap:16px;flex-wrap:wrap}
-.go a{font-family:var(--f-label);font-size:12px;letter-spacing:.05em;text-decoration:none;border-bottom:1px solid var(--ink-soft);padding-bottom:1px}
-.go a.primary{color:var(--paper);background:var(--ink);border:none;padding:6px 14px;border-radius:2px}
-.go a:hover{opacity:.8}
-.samples{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-width:620px;margin:0 0 16px}
-.samples .label{grid-column:1/-1}
-.samples a{display:flex;flex-direction:column;gap:2px;text-decoration:none;border:1px solid var(--rule);background:var(--paper);padding:10px 12px;font-size:13px;line-height:1.5}
-.samples a b{font-family:var(--f-label);font-weight:500;font-size:11px;letter-spacing:.08em;color:var(--ink-soft)}
-.samples a:hover{border-color:var(--ink-soft)}
-.go{align-items:center}
-.feature{background:var(--paper-2);border:1px solid var(--rule);padding:26px 26px 22px;margin-bottom:6px}
-.feature.work{border-bottom:1px solid var(--rule)}
-/* 작업(Works)은 종이 위 목록, 일하는 방식(Practice)은 한 장의 회색 판으로 구분 */
-.works .work:last-child{border-bottom:none}
-.practice{background:var(--paper-2);border-top:3px solid var(--accent);padding:30px 32px 36px}
-.practice .sec-head{border-color:#cfc9ba}
-.practice .sec-head .label,.practice .sub,.practice .devices .when{color:var(--accent)}
-.practice .devices li{background:var(--paper)}
-.work.keynote{background:var(--paper);border:1px solid var(--rule);border-left:4px solid var(--accent);padding:24px 26px 18px 22px;margin:0 0 10px}
-.work.keynote .kind{border-color:var(--accent);color:var(--accent)}
+/* 오른쪽 미리보기 */
+.stage{display:grid}
+.panel{grid-area:1/1;border-radius:22px;padding:clamp(22px,3vw,34px);display:flex;flex-direction:column;gap:20px;height:clamp(620px,calc(100vh - 72px),820px);background:var(--bg);color:var(--fg);opacity:0;visibility:hidden;transition:opacity .25s ease}
+.panel.on{opacity:1;visibility:visible}
+.p-head{display:flex;flex-direction:column;gap:16px;flex:none}
+.p-head > div{display:flex;flex-direction:column;gap:10px;max-width:620px}
+.p-kind{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;opacity:.8}
+.p-title{display:none;margin:0;font-family:var(--f-display);font-size:22px;line-height:1.4}
+.p-line{margin:0;font-family:var(--f-display);font-size:clamp(21px,2.3vw,29px);font-weight:700;line-height:1.5;text-wrap:balance}
+.ctas{display:flex;gap:8px;flex-wrap:wrap;flex:none;align-self:flex-start}
+.btn{display:inline-block;text-decoration:none;border-radius:999px;padding:12px 20px;font-size:14px;font-weight:700;white-space:nowrap;transition:transform .15s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn.solid{background:var(--fg);color:var(--bg)}
+.btn.line{border:1px solid currentColor}
+.shot{display:block;width:100%;height:auto;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.16)}
+.cover{flex:1;min-height:0;object-fit:cover;object-position:left top}
+.nums,.trio{flex:none}
+.nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0;padding:0;list-style:none}
+.nums li{border-top:1px solid currentColor;padding-top:10px;font-size:13px;line-height:1.5;opacity:.92}
+.nums b{display:block;font-family:var(--f-display);font-size:clamp(22px,2.4vw,30px);line-height:1.2}
+.note{margin:0;font-family:var(--f-mono);font-size:11.5px;opacity:.7}
 
-.practice-lead{font-family:var(--f-display);font-size:17px;line-height:1.8;margin:0 0 26px;max-width:720px;text-wrap:pretty}
-.sub{font-family:var(--f-label);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin:30px 0 12px}
-.principles{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px}
-.principles li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:4px 10px;padding:16px 0;border-top:1px solid var(--rule)}
-.principles .n{font-family:var(--f-label);font-size:11px;letter-spacing:.1em;color:var(--accent);padding-top:5px}
-.principles h4{margin:0 0 4px;font-family:var(--f-display);font-size:18px;line-height:1.4}
-.principles p{margin:0;font-size:13.5px;color:var(--ink);line-height:1.7}
-.flow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;counter-reset:f}
-.flow li{counter-increment:f;background:var(--paper);border:1px solid var(--rule);padding:10px 10px 12px;font-size:12.5px;line-height:1.5}
-.flow li::before{content:counter(f,decimal-leading-zero);display:block;font-family:var(--f-label);font-size:10.5px;color:var(--ink-soft);margin-bottom:4px}
-.flow b{display:block;font-weight:500;font-size:13.5px;margin-bottom:2px}
-.flow span{color:var(--ink-soft)}
-.mcp{width:100%;border-collapse:collapse;font-size:13px}
-.mcp th{font-family:var(--f-label);font-weight:400;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);text-align:left;padding:0 10px 6px 0;border-bottom:1px solid var(--rule)}
-.mcp td{padding:8px 10px 8px 0;border-bottom:1px solid var(--rule);vertical-align:top}
-.mcp td:nth-child(2){font-family:var(--f-label);font-size:12px;white-space:nowrap}
-.mcp td:nth-child(3){color:var(--ink-soft)}
-.mcp-more{margin:12px 0 0;font-size:13px;line-height:1.7;max-width:760px}
-.mcp-more .tags{margin:6px 0 0}
-.devices{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.devices li{background:var(--paper-2);border:1px solid var(--rule);padding:16px 16px 14px}
-.devices .when{font-family:var(--f-label);font-size:10.5px;letter-spacing:.1em;color:var(--ink-soft);text-transform:uppercase}
-.devices h4{margin:4px 0 6px;font-family:var(--f-display);font-size:18px}
-.devices p{margin:0;font-size:13px;line-height:1.7}
-.hub{margin:12px 0 0;font-size:13.5px;line-height:1.75;max-width:760px}
-.notes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 32px;margin:0;padding:0;list-style:none}
-.notes li{border-left:2px solid var(--rule);padding:2px 0 2px 12px;font-size:13.5px;line-height:1.65}
-.notes b{font-weight:500}
+/* 두산: 세 갈래를 한눈에 */
+.trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.trio figure{margin:0;display:flex;flex-direction:column;gap:8px}
+.trio .frame{border-radius:12px;overflow:hidden;aspect-ratio:1/1;background:#fff;box-shadow:0 12px 30px rgba(0,0,0,.12)}
+.trio img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+.trio figcaption{font-size:13px;font-weight:700;line-height:1.45}
+.trio figcaption span{display:block;font-weight:400;opacity:.75;font-size:12px}
 
-footer{border-top:1px solid var(--rule);padding-top:18px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-soft)}
-@media (max-width:760px){
-  .practice{padding:22px 16px 28px}
-  .work.keynote{padding:18px 16px 14px 14px}
-  .wrap{padding:36px 18px 56px;gap:44px}
-  h1{font-size:32px}
-  .work{grid-template-columns:minmax(0,1fr)}
-  .facts b{font-size:17px}
-  .facts li{font-size:11.5px;padding-left:8px}
-  .work .meta{flex-direction:row;align-items:center;gap:12px}
-  .feature{padding:20px 18px}
-  .principles,.notes,.devices{grid-template-columns:minmax(0,1fr)}
-  .mcp td:nth-child(2){white-space:normal}
-  .mcp{font-size:12px}
-  .flow{grid-template-columns:repeat(2,minmax(0,1fr))}
+/* 캠핑장 */
+.phone{flex:1;min-height:0;align-self:center;width:auto;max-width:100%;object-fit:contain;border-radius:18px}
+
+@media (max-width:860px){
+  .page{grid-template-columns:minmax(0,1fr)}
+  .side{position:static;min-height:0;gap:28px}
+  .list,.side footer.desk{display:none}
+  .stage{gap:18px}
+  .panel{grid-area:auto;opacity:1;visibility:visible;height:auto}
+  .phone{flex:none;width:100%}
+  .p-title{display:block}
+  .cover{flex:none;aspect-ratio:16/10;height:auto}
+  .btn{padding:11px 16px;font-size:13.5px}
+  .trio{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .trio figcaption{font-size:12px}
+  .trio figcaption span{display:none}
+  .mob-foot{display:flex !important}
 }
-@media (min-width:761px) and (max-width:980px){
-  .flow{grid-template-columns:repeat(4,minmax(0,1fr))}
-}
-.prac-sum{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:22px 36px;align-items:start;margin-bottom:22px}
-.prac-sum .label{display:block;margin-bottom:8px;color:var(--accent)}
-.prac-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
-.prac-list li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:8px;padding:9px 0;border-top:1px solid #cfc9ba;font-family:var(--f-display);font-size:16.5px}
-.prac-list li:last-child{border-bottom:1px solid #cfc9ba}
-.prac-list .n{font-family:var(--f-label);font-size:11px;color:var(--accent);padding-top:4px}
-.prac-sum .facts{grid-template-columns:minmax(0,1fr);gap:14px;margin:30px 0 0}
-@media (max-width:760px){.prac-sum{grid-template-columns:minmax(0,1fr)}.prac-sum .facts{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:0}}
+.mob-foot{display:none;gap:18px;font-family:var(--f-mono);font-size:12px;color:var(--soft);padding:4px 2px 0}
+.mob-foot a{text-decoration:none}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="page">
 
-  <header>
-    <span class="label">Mingji · Works</span>
-    <h1>밍지<small>읽고, 생각하고, 필요한 도구는 직접 만듭니다</small></h1>
-    <p class="intro">책과 영화와 유물에서 건진 생각을 기록하고 키우는 일, 일상에서 반복되는 일을 자동으로 처리하는 작은 도구를 만드는 일, 그리고 연구용역 실무에서 Claude와 함께 일하는 방식을 이곳에 모아 둡니다.</p>
-    <nav class="links" aria-label="바깥 링크">
-      <a href="#h-works">작업 보기</a>
-      <a href="#h-practice">일하는 방식</a>
+  <aside class="side">
+    <header>
+      <span class="eyebrow">MINGJI · WORKS</span>
+      <h1>밍지</h1>
+      <p class="bal">읽고, 생각하고, 필요한 도구는 직접&nbsp;만듭니다.</p>
+    </header>
+
+    <ul class="list" role="tablist" aria-label="작업 목록">
+      <li><button role="tab" id="t-lib" aria-controls="p-lib" aria-selected="true"><span class="no">01</span><span class="t"><b>밍지의 알렉산드리아 도서관</b><span>독서·사유 아카이브</span></span><span class="arr" aria-hidden="true">→</span></button></li>
+      <li><button role="tab" id="t-doosan" aria-controls="p-doosan" aria-selected="false"><span class="no">02</span><span class="t"><b>두산 베어스 대시보드와 경기 알림</b><span>데이터·자동화</span></span><span class="arr" aria-hidden="true">→</span></button></li>
+      <li><button role="tab" id="t-camp" aria-controls="p-camp" aria-selected="false"><span class="no">03</span><span class="t"><b>캠핑장 빈자리 알림</b><span>생활 자동화</span></span><span class="arr" aria-hidden="true">→</span></button></li>
+      <li><button role="tab" id="t-prac" aria-controls="p-prac" aria-selected="false"><span class="no">P</span><span class="t"><b>Claude와 일하는 방식</b><span>연구용역 실무</span></span><span class="arr" aria-hidden="true">→</span></button></li>
+    </ul>
+
+    <footer class="desk">
       <a href="https://github.com/Kimey102">GitHub ↗</a>
-    </nav>
-  </header>
+      <span>마지막 갱신 <!--n:date-->2026.11.20<!--/n--></span>
+    </footer>
+  </aside>
 
-  <section class="works" aria-labelledby="h-works">
-    <div class="sec-head">
-      <h2 id="h-works"><span class="label">Works</span><span class="ko">작업</span></h2>
-      <span class="label">3 projects</span>
-    </div>
+  <main class="stage">
 
-    <article class="work">
-      <div class="meta"><span class="no">01</span><span class="kind">독서 · 사유 아카이브</span></div>
-      <div>
-        <h3>밍지의 알렉산드리아 도서관</h3>
-        <p>책, 영화, 유물, 유튜브, 강연에서 떠오른 생각을 한 문장짜리 개념 카드로 남기고, 그 생각이 언제 무엇 때문에 움직였는지까지 기록하는 아카이브입니다. 노션 데이터베이스 세 곳(서가, 개념 연결망, 사유의 변곡점)을 관계로 엮고, 이 로비 페이지에서 한 장으로 펼쳐 봅니다.</p>
-        <ul class="facts">
-          <li><b><!--n:books-->102<!--/n--></b>서가에 꽂은 책·매체</li>
-          <li><b><!--n:concepts-->58<!--/n--></b>개념 카드</li>
-          <li><b><!--n:turns-->9<!--/n--></b>기록된 사유의 변곡점</li>
-        </ul>
-        <div class="tags"><span>Notion</span><span>Claude</span><span>HTML/JS</span><span>지식 관리</span></div>
-        <div class="go"><a class="primary" href="library/">도서관 들어가기 →</a></div>
-      </div>
-    </article>
-
-    <article class="work">
-      <div class="meta"><span class="no">02</span><span class="kind">데이터 · 자동화</span></div>
-      <div>
-        <h3>두산 베어스 시즌 대시보드와 경기 알림</h3>
-        <p>시즌 전체를 보는 대시보드와 경기마다 받는 텔레그램 알림, 두 갈래로 운영했습니다. 대시보드는 GitHub Actions가 매일 아침 KBO 순위, 득실, 최근 10경기, 상대 전적, 일정을 모아 다시 만들고, 가을야구 진출 확률은 피타고리안 승률과 실제 성적을 섞은 전력값으로 남은 경기를 10만 번 모의 시행해 계산합니다.</p>
-        <p>경기가 있는 날에는 텔레그램 봇이 두 번 알림을 보냅니다. 경기 전에는 선발 투수와 라인업에 노션에 정리해 둔 예상 승률과 사전 분석 리포트를 붙여 보내고, 경기가 끝나면 박스스코어와 주요 기록에 사후 분석 리포트를 붙여 보냅니다. 봇은 승률을 스스로 계산하지 않고 사람이 분석한 값을 배달만 하며, 수집에 실패한 항목은 비워 두고 값을 지어내지 않도록 설계했습니다.</p>
-        <ul class="facts">
-          <li><b>매일 08:30</b>대시보드 자동 갱신</li>
-          <li><b>경기 전·후</b>텔레그램 알림 발송</li>
-          <li><b>35편</b>사전·사후 분석 리포트</li>
-        </ul>
-        <div class="tags"><span>Python</span><span>Playwright</span><span>GitHub Actions</span><span>GitHub Pages</span><span>Telegram Bot</span><span>Notion API</span></div>
-        <div class="samples">
-          <span class="label">분석 리포트 샘플 · 10.6 사직 롯데전</span>
-          <a href="/KBO_Doosan-Bears/reports/2026-10-06_Lotte_pre.html"><b>경기 전</b>두산 승률 66% 예측과 근거</a>
-          <a href="/KBO_Doosan-Bears/reports/2026-10-06_Lotte_post.html"><b>경기 후</b>두산 3 : 1 롯데 결과 분석</a>
+    <section class="panel on" id="p-lib" role="tabpanel" aria-labelledby="t-lib" style="--bg:#EBCFCB;--fg:#3A2C2B">
+      <div class="p-head">
+        <div>
+          <span class="p-kind">01 · 독서·사유 아카이브</span>
+          <h2 class="p-title">밍지의 알렉산드리아 도서관</h2>
+          <p class="p-line">읽은 것에서 건진 생각이 언제, 무엇 때문에 움직였는지까지&nbsp;남깁니다.</p>
         </div>
-        <div class="go"><a class="primary" href="/KBO_Doosan-Bears/">대시보드 보기 →</a><a href="https://github.com/Kimey102/KBO_Doosan-Bears">저장소 보기 ↗</a></div>
+        <div class="ctas"><a class="btn solid" href="library/">도서관 들어가기 →</a></div>
       </div>
-    </article>
+      <img class="shot cover" src="assets/img/library_top.jpg" alt="알렉산드리아 도서관 공개본 첫 화면" width="1280" height="800">
+      <ul class="nums">
+        <li><b><!--n:books-->102<!--/n--></b>서가에 꽂은 책·매체</li>
+        <li><b><!--n:concepts-->58<!--/n--></b>개념 카드</li>
+        <li><b><!--n:turns-->9<!--/n--></b>기록된 사유의 변곡점</li>
+      </ul>
+    </section>
 
-    <article class="work">
-      <div class="meta"><span class="no">03</span><span class="kind">생활 자동화</span></div>
-      <div>
-        <h3>캠핑장 빈자리 알림</h3>
-        <p>엑스티켓 캠핑장(기본값 앵봉산 가족캠핑장)의 예약 현황을 1분 간격으로 조회하고, 감시 중인 날짜에 새 빈자리가 생기면 텔레그램으로 알려 줍니다. 직전 결과와 비교해 새로 열린 자리만 알리고, GitHub의 예약 실행 지연을 피하려고 한 번 시작된 실행이 몇 시간 동안 이어서 감시하도록 만들었습니다.</p>
-        <div class="tags"><span>Python</span><span>GitHub Actions</span><span>Telegram Bot</span></div>
-        <div class="go"><a href="https://github.com/Kimey102/Aengbong_Camp_alert">저장소 보기 ↗</a></div>
+    <section class="panel" id="p-doosan" role="tabpanel" aria-labelledby="t-doosan" style="--bg:#D9DDD3;--fg:#2E3A2E">
+      <div class="p-head">
+        <div>
+          <span class="p-kind">02 · 데이터·자동화</span>
+          <h2 class="p-title">두산 베어스 대시보드와 경기 알림</h2>
+          <p class="p-line">매일 아침 시즌을 다시 계산하고, 경기마다 두&nbsp;번 알림을 보냅니다.</p>
+        </div>
+        <div class="ctas"><a class="btn solid" href="works/doosan/">자세히 보기 →</a><a class="btn line" href="/KBO_Doosan-Bears/">대시보드 ↗</a></div>
       </div>
-    </article>
-  </section>
+      <img class="shot cover" src="assets/img/dashboard.jpg" alt="두산 베어스 2026 시즌 대시보드" width="1280" height="800">
+      <div class="trio">
+        <figure><div class="frame"><img src="assets/img/report_pre.jpg" alt="경기 전 승률 예측 리포트" loading="lazy"></div><figcaption>경기 전 리포트<span>두산&nbsp;66% 예측과 근거</span></figcaption></figure>
+        <figure><div class="frame"><img src="assets/img/tg_pre.jpg" alt="경기 전 텔레그램 알림" loading="lazy"></div><figcaption>경기 전 알림<span>선발 매치업과 예상 승률</span></figcaption></figure>
+        <figure><div class="frame"><img src="assets/img/tg_post.jpg" alt="경기 후 텔레그램 알림" loading="lazy"></div><figcaption>경기 후 알림<span>두산&nbsp;3&nbsp;:&nbsp;1&nbsp;롯데 박스스코어</span></figcaption></figure>
+      </div>
+    </section>
 
-  <section class="practice" aria-labelledby="h-practice">
-    <div class="sec-head">
-      <h2 id="h-practice"><span class="label">Practice</span><span class="ko">Claude와 일하는 방식</span></h2>
-      <span class="label">연구용역 실무</span>
-    </div>
-    <p class="practice-lead">타당성조사, 기본계획수립, 기술로드맵, 국가R&amp;D 성과검증 등 과업마다 독자와 서식과 마감이 모두 다른 연구용역 일을 Claude와 함께 합니다. 질문 하나에 답 하나를 받는 챗봇이 아니라, 계획을 세우고 법령·통계·파일을 직접 열어 확인한 뒤 한글·PPT 파일까지 만드는 에이전트로 씁니다.</p>
-    <div class="prac-sum">
-      <div>
-        <span class="label">도구보다 먼저 정한 다섯 가지</span>
-        <ol class="prac-list"><li><span class="n">01</span><span>과업마다 프로젝트</span></li><li><span class="n">02</span><span>계획 먼저, 한 번에 한 장</span></li><li><span class="n">03</span><span>기준을 규칙으로</span></li><li><span class="n">04</span><span>근거는 원문에서</span></li><li><span class="n">05</span><span>도구마다 맡는 일</span></li></ol>
+    <section class="panel" id="p-camp" role="tabpanel" aria-labelledby="t-camp" style="--bg:#E9DFCF;--fg:#3D3426">
+      <div class="p-head">
+        <div>
+          <span class="p-kind">03 · 생활 자동화</span>
+          <h2 class="p-title">캠핑장 빈자리 알림</h2>
+          <p class="p-line">감시 중인 날짜에 빈자리가 나면 1분&nbsp;안에 텔레그램으로 알려&nbsp;줍니다.</p>
+        </div>
+        <div class="ctas"><a class="btn solid" href="https://github.com/Kimey102/Aengbong_Camp_alert">저장소 보기 ↗</a></div>
       </div>
-      <ul class="facts">
+      <img class="shot phone" src="assets/img/tg_camp.jpg" alt="캠핑장 빈자리 발생 텔레그램 알림" width="900" height="915" loading="lazy">
+    </section>
+
+    <section class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac" style="--bg:#2E2B2B;--fg:#F4F1EC">
+      <div class="p-head">
+        <div>
+          <span class="p-kind">P · 연구용역 실무</span>
+          <h2 class="p-title">Claude와 일하는 방식</h2>
+          <p class="p-line">계획을 세우고 원문을 확인해 한글 파일까지 만드는 에이전트로&nbsp;씁니다.</p>
+        </div>
+        <div class="ctas"><a class="btn solid" href="practice/">자세히 보기 →</a></div>
+      </div>
+      <img class="shot cover" src="assets/img/practice.jpg" alt="Claude와 일하는 방식 페이지" width="1280" height="800" loading="lazy">
+      <ul class="nums">
         <li><b>7단계</b>한 과업이 도는 순서</li>
-        <li><b>7개</b>연결해 둔 공공·문서 도구(MCP)</li>
+        <li><b>7개</b>연결해 둔 공공·문서 도구</li>
         <li><b>3대</b>오가며 일하는 기기</li>
       </ul>
-    </div>
-    <div class="go"><a class="primary" href="practice/">일하는 방식 자세히 보기 →</a></div>
-  </section>
+    </section>
 
-  <footer>
-    <span>© 2026 밍지</span>
-    <span>마지막 갱신 <!--n:date-->2026.11.20<!--/n--></span>
-  </footer>
+    <footer class="mob-foot"><a href="https://github.com/Kimey102">GitHub ↗</a><span>© 2026 밍지</span></footer>
+  </main>
 </div>
+
+<script>
+(function(){
+  var tabs=[].slice.call(document.querySelectorAll('[role="tab"]'));
+  var wide=window.matchMedia('(min-width:861px)');
+  function pick(t){
+    tabs.forEach(function(x){
+      var on=x===t;
+      x.setAttribute('aria-selected',on?'true':'false');
+      x.tabIndex=on?0:-1;
+      document.getElementById(x.getAttribute('aria-controls')).classList.toggle('on',on);
+    });
+  }
+  tabs.forEach(function(t,i){
+    t.addEventListener('click',function(){pick(t)});
+    t.addEventListener('mouseenter',function(){if(wide.matches)pick(t)});
+    t.addEventListener('keydown',function(e){
+      var d=e.key==='ArrowDown'?1:e.key==='ArrowUp'?-1:0;
+      if(!d)return;e.preventDefault();
+      var n=tabs[(i+d+tabs.length)%tabs.length];n.focus();pick(n);
+    });
+    if(i)t.tabIndex=-1;
+  });
+  var h=document.getElementById('t-'+location.hash.slice(1));
+  if(h){pick(h);if(!wide.matches)document.getElementById(h.getAttribute('aria-controls')).scrollIntoView();}
+})();
+</script>
 </body>
 </html>
