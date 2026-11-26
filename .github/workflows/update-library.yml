@@ -25,15 +25,17 @@ jobs:
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: python scripts/build_library.py
-      - name: 바뀐 내용이 있으면 커밋
+      - name: 커밋 (기록이 그대로여도 확인 날짜는 매일 올린다)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html library/index.html
-          # 날짜만 바뀐 경우는 커밋하지 않는다
-          if git diff --cached -U0 | grep -E '^[+-][^+-]' | grep -vqE '기록 기준|기준입니다|SNAP_NOW|<!--n:date-->'; then
+          if git diff --cached --quiet; then
+            echo "바뀐 것이 없습니다."
+          elif git diff --cached -U0 | grep -E '^[+-][^+-]' | grep -vqE '기록 기준|기준입니다|SNAP_NOW|<!--n:date-->'; then
             git commit -m "도서관 기록 갱신 ($(TZ=Asia/Seoul date +%Y.%m.%d))"
             git push
           else
-            echo "기록에 바뀐 것이 없어 커밋하지 않습니다."
+            git commit -m "도서관 확인 날짜 갱신 ($(TZ=Asia/Seoul date +%Y.%m.%d))"
+            git push
           fi
